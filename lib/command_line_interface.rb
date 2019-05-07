@@ -1,7 +1,7 @@
 require_all './app/models'
 
 def welcome_message
-  puts "Hello job seeker! Welcome to SMARTER CLASSIFIEDS!
+  puts "Hello job seeker! Welcome to SMARTER CLASSIFIDES!
 
 In order for us to find the jobs best suited to you, we will ask you to quickly create a
 profile.
@@ -23,4 +23,25 @@ def gets_user_data
   new_user.update(experience: gets.chomp)
   print "Location: "
   new_user.update(location: gets.chomp)
+end
+
+def computer_ascii
+puts "     ______________
+    /             /|
+   /             / |
+  /____________ /  |
+  | ___________ |  |
+  ||           ||  |
+  ||           ||  |
+  ||           ||  |
+  ||___________||  |
+  |   _______   |  /
+ /|  (_______)  | /
+( |_____________|/
+'\'
+.=======================.
+| ::::::::::::::::  ::: |
+| ::::::::::::::[]  ::: |
+|   -----------     ::: |
+`-----------------------'"
 end

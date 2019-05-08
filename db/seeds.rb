@@ -15,7 +15,7 @@ end
 
 def update_job_table
   get_job_listings.each do |hash|
-    Job.create(title: hash['title'], position_type: hash['type'], description: strip_tags(hash['description']), url: hash['url'], created_at: hash['created_at'], company_url: hash['company_url'], location: hash['location'])
+    Job.create(title: hash['title'], company: hash['company'], position_type: hash['type'], description: strip_tags(hash['description']), url: hash['url'], created_at: hash['created_at'], company_url: hash['company_url'], location: hash['location'])
   end
 end
 
@@ -27,12 +27,12 @@ def strip_tags s
    .gsub(/\s,/,',')
 end
 # binding.pry
-# update_job_table
+#update_job_table
 
-jamal = User.new
-jamal.name = 'Jamal Shareef'
-jamal.skills = "Full Stack Web Developer"
-jamal.experience = 4
-jamal.location = 'Port Coquitlam, BC'
-jamal.save
-jamal.auto_search
+# jamal = User.new
+# jamal.name = 'Jamal Shareef'
+# jamal.skills = "Full Stack Web Developer"
+# jamal.experience = 4
+# jamal.location = 'Port Coquitlam, BC'
+# jamal.save
+# jamal.auto_search

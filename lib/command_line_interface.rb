@@ -93,6 +93,19 @@ def search_arbitrary_criteria
  end
 end
 
+def add_favorite(num)
+  new_job = SavedJob.create
+  new_job.user = User.last
+  new_job.job = Job.find(num)
+  User.last.saved_jobs << new_job
+  Job.find(num).saved_jobs << new_job
+end
+
+
+def add_interest(rating)
+  SavedJob.last.update(interest_level: rating)
+end
+
 
 
 def skill_match_title?(job)

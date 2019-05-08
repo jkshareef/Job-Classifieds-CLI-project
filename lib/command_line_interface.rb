@@ -1,5 +1,50 @@
 require_all './app/models'
 
+def run
+  computer_ascii
+  welcome_message
+  gets_user_data
+  menu
+  input = gets.chomp.downcase
+  until input == "quit"
+    if input == "1"
+      auto_search
+      save_job_with_interest_rating
+    elsif input == "2"
+      search_manual_entry
+      save_job_with_interest_rating
+    # elsif input == "3"
+    #   #view and edit jobs
+    # elsif input == "4"
+    #   #update profile
+    end
+    menu
+    input = gets.chomp
+  end
+  exit_program
+end
+
+def computer_ascii
+  puts "     ______________
+    /             /|
+   /             / |
+  /____________ /  |
+  | ___________ |  |
+  ||           ||  |
+  ||           ||  |
+  ||           ||  |
+  ||___________||  |
+  |   _______   |  /
+ /|  (_______)  | /
+( |_____________|/
+'\'
+.=======================.
+| ::::::::::::::::  ::: |
+| ::::::::::::::[]  ::: |
+|   -----------     ::: |
+`-----------------------'"
+end
+
 def welcome_message
   puts "Hello job seeker! Welcome to SMARTER CLASSIFIEDS!
 
@@ -24,27 +69,7 @@ def gets_user_data
   new_user.update(experience: gets.chomp)
   print "Location: "
   new_user.update(location: gets.chomp)
-end
-
-def computer_ascii
-puts "     ______________
-    /             /|
-   /             / |
-  /____________ /  |
-  | ___________ |  |
-  ||           ||  |
-  ||           ||  |
-  ||           ||  |
-  ||___________||  |
-  |   _______   |  /
- /|  (_______)  | /
-( |_____________|/
-'\'
-.=======================.
-| ::::::::::::::::  ::: |
-| ::::::::::::::[]  ::: |
-|   -----------     ::: |
-`-----------------------'"
+  puts ' '
 end
 
 def menu
@@ -53,53 +78,12 @@ def menu
   puts "2. Search for jobs by custom criteria"
   puts "3. View and edit saved jobs"
   puts "4. Update your profile"
-  puts "5. Exit program"
-  puts "Please select an option using the number:"
+  print "Please select an option by reference number or 'quit' to exit: "
 end
-
-def run
-  computer_ascii
-  welcome_message
-  gets_user_data
-  menu
-  input = gets.chomp
-  until input == "5"
-    if input == "1"
-      binding.pry
-      auto_search
-    elsif input == "2"
-      search_manual_entry
-    # elsif input == "3"
-    #   #view and edit jobs
-    # elsif input == "4"
-    #   #update profile
-    end
-    menu
-    input = gets.chomp
-  end
-  exit_program
-end
-
-# def view_and_edit_jobs
-#   jobs = User.last.saved_jobs
-#   jobs.each_with_index do |job, index|
-#     puts "#{index + 1}. #{job.title}"
-#     puts job.description
-#   end
-#   puts "Would you like to delete jobs from your list?"
-#   input = gets.chomp
-#   if input.downcase == "yes" || "y"
-#     puts "Which job would you like to delete?"
-#     puts "1. Enter job number"
-#   end
-# end
 
 def exit_program
   puts "Goodbye!"
 end
-
-
-
 
 def auto_search
   keywords = User.last.skills.scan(/\w+/)
@@ -156,7 +140,39 @@ def location_match?(job)
   job.location.downcase == User.last.location.downcase
 end
 
-def add_favorite(num)
+def save_job_with_interest_rating
+  puts ' '
+  puts '* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *'
+  puts ' '
+  puts "Above is a list of jobs based on your search criteria! In order to save a job
+(or multiple jobs) to your job list, please enter the 'Job Number' and rate your
+current level of interest in that listing!"
+
+  i = 1
+
+  while i == 1
+    puts ' '
+    print "Job Number: "
+    job_number = gets.chomp
+    print "Curent level of interest on a scale of 1-10: "
+    job_rating = gets.chomp
+
+    add_to_saved_jobs(job_number)
+    add_interest_rating(job_rating)
+
+    puts ' '
+    print "Would you like to add another job? Please enter 'yes' or 'no': "
+    status = gets.chomp
+
+    if status.downcase == 'no'
+      i = 0
+    end
+  end
+
+  puts ' '
+end
+
+def add_to_saved_jobs(num)
   new_job = SavedJob.create
   new_job.user = User.last
   new_job.job = Job.find(num)
@@ -164,6 +180,6 @@ def add_favorite(num)
   Job.find(num).saved_jobs << new_job
 end
 
-def add_interest(rating)
+def add_interest_rating(rating)
   SavedJob.last.update(interest_level: rating)
 end

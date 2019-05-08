@@ -1,5 +1,50 @@
 require_all './app/models'
 
+def run
+  computer_ascii
+  welcome_message
+  gets_user_data
+  menu
+  input = gets.chomp.downcase
+  until input == "quit"
+    if input == "1"
+      auto_search
+      save_job_with_interest_rating
+    elsif input == "2"
+      search_manual_entry
+      save_job_with_interest_rating
+    # elsif input == "3"
+    #   #view and edit jobs
+    # elsif input == "4"
+    #   #update profile
+    end
+    menu
+    input = gets.chomp
+  end
+  exit_program
+end
+
+def computer_ascii
+  puts "     ______________
+    /             /|
+   /             / |
+  /____________ /  |
+  | ___________ |  |
+  ||           ||  |
+  ||           ||  |
+  ||           ||  |
+  ||___________||  |
+  |   _______   |  /
+ /|  (_______)  | /
+( |_____________|/
+'\'
+.=======================.
+| ::::::::::::::::  ::: |
+| ::::::::::::::[]  ::: |
+|   -----------     ::: |
+`-----------------------'"
+end
+
 def welcome_message
   puts "Hello job seeker! Welcome to SMARTER CLASSIFIEDS!
 
@@ -24,110 +69,20 @@ def gets_user_data
   new_user.update(experience: gets.chomp)
   print "Location: "
   new_user.update(location: gets.chomp)
-end
-
-def computer_ascii
-puts "     ______________
-    /             /|
-   /             / |
-  /____________ /  |
-  | ___________ |  |
-  ||           ||  |
-  ||           ||  |
-  ||           ||  |
-  ||___________||  |
-  |   _______   |  /
- /|  (_______)  | /
-( |_____________|/
-'\'
-.=======================.
-| ::::::::::::::::  ::: |
-| ::::::::::::::[]  ::: |
-|   -----------     ::: |
-`-----------------------'"
-end
-
-def choose_search
   puts ' '
-  print 'Please enter whether you would like to search based on your current skill-set (1)
-or based on a list of skills you would like to enter manually (2)
-
-SEARCH TYPE: '
-
-  search_choice = gets.chomp
-
-  if search_choice == '2'
-    search_manual_entry
-  else
-    auto_search
-  end
-end
-
-def save_job_with_interest_rating
-  puts "Above is your list of jobs! In order to save a job (or multiple jobs) to your job list, please
-enter the 'Job Number' and rate your current level of interest in that listing!"
-
-  print "Job Number: "
-  job_number = gets.chomp
-  print "Curent level of interest on a scale of 1-10: "
-  job_rating = gets.chomp
 end
 
 def menu
-  puts
-  puts "Please select from the following options:"
+  puts "=======MENU========="
   puts "1. Search for jobs by skillset"
   puts "2. Search for jobs by custom criteria"
   puts "3. View and edit saved jobs"
   puts "4. Update your profile"
-  puts "5. Exit program"
-  gets.chomp
-end
-
-def run
-  computer_ascii
-  welcome_message
-  gets_user_data
-  menu
-  puts "Please select an option using the number"
-  input = gets.chomp
-  until input == 5
-    if num == 1
-      auto_search
-      menu
-    elsif num == 2
-      search_arbitrary_criteria
-      menu
-    # elsif num == 3
-    #   #view and edit jobs
-    #   menu
-    # elsif num == 4
-    #   #update profile
-    #   menu
-    end
-    puts "Please select an option using the number"
-    input = gets.chomp
-  end
-  exit_program
-end
-
-def view_and_edit_jobs
-  jobs = User.last.saved_jobs
-  jobs.each_with_index do |job, index|
-    puts "#{index + 1}. #{job.title}"
-    puts job.description
-  end
-  puts "Would you like to delete jobs from your list?"
-  input = gets.chomp
-  if input.downcase == "yes" || "y"
-    puts "Which job would you like to delete?"
-    puts "1. Enter job number"
-  end
+  print "Please select an option by reference number or 'quit' to exit: "
 end
 
 def exit_program
   puts "Goodbye!"
-  true
 end
 
 def auto_search
@@ -185,7 +140,39 @@ def location_match?(job)
   job.location.downcase == User.last.location.downcase
 end
 
-def add_favorite(num)
+def save_job_with_interest_rating
+  puts ' '
+  puts '* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *'
+  puts ' '
+  puts "Above is a list of jobs based on your search criteria! In order to save a job
+(or multiple jobs) to your job list, please enter the 'Job Number' and rate your
+current level of interest in that listing!"
+
+  i = 1
+
+  while i == 1
+    puts ' '
+    print "Job Number: "
+    job_number = gets.chomp
+    print "Curent level of interest on a scale of 1-10: "
+    job_rating = gets.chomp
+
+    add_to_saved_jobs(job_number)
+    add_interest_rating(job_rating)
+
+    puts ' '
+    print "Would you like to add another job? Please enter 'yes' or 'no': "
+    status = gets.chomp
+
+    if status.downcase == 'no'
+      i = 0
+    end
+  end
+
+  puts ' '
+end
+
+def add_to_saved_jobs(num)
   new_job = SavedJob.create
   new_job.user = User.last
   new_job.job = Job.find(num)
@@ -193,6 +180,6 @@ def add_favorite(num)
   Job.find(num).saved_jobs << new_job
 end
 
-def add_interest(rating)
+def add_interest_rating(rating)
   SavedJob.last.update(interest_level: rating)
 end

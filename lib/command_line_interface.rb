@@ -11,6 +11,7 @@ your skills separated by spaces), your experience in your current field (in year
 location in which you are searching for a job. "
 end
 
+
 def gets_user_data
 
   new_user = User.create()
@@ -70,11 +71,64 @@ enter the 'Job Number' and rate your current level of interest in that listing!"
   job_number = gets.chomp
   print "Curent level of interest on a scale of 1-10: "
   job_rating = gets.chomp
-
 end
 
+def menu
+  puts
+  puts "Please select from the following options:"
+  puts "1. Search for jobs by skillset"
+  puts "2. Search for jobs by custom criteria"
+  puts "3. View and edit saved jobs"
+  puts "4. Update your profile"
+  puts "5. Exit program"
+  gets.chomp
+end
 
+def run
+  computer_ascii
+  welcome_message
+  gets_user_data
+  menu
+  puts "Please select an option using the number"
+  input = gets.chomp
+  until input == 5
+    if num == 1
+      auto_search
+      menu
+    elsif num == 2
+      search_arbitrary_criteria
+      menu
+    # elsif num == 3
+    #   #view and edit jobs
+    #   menu
+    # elsif num == 4
+    #   #update profile
+    #   menu
+    end
+    puts "Please select an option using the number"
+    input = gets.chomp
+  end
+  exit_program
+end
 
+def view_and_edit_jobs
+  jobs = User.last.saved_jobs
+  jobs.each_with_index do |job, index|
+    puts "#{index + 1}. #{job.title}"
+    puts job.description
+  end
+  puts "Would you like to delete jobs from your list?"
+  input = gets.chomp
+  if input.downcase == "yes" || "y"
+    puts "Which job would you like to delete?"
+    puts "1. Enter job number"
+  end
+end
+
+def exit_program
+  puts "Goodbye!"
+  true
+end
 
 def auto_search
   keywords = User.last.skills.scan(/\w+/)

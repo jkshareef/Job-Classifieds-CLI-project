@@ -48,14 +48,13 @@ puts "     ______________
 end
 
 def menu
-  puts
-  puts "Please select from the following options:"
+  puts "=======MENU========="
   puts "1. Search for jobs by skillset"
   puts "2. Search for jobs by custom criteria"
   puts "3. View and edit saved jobs"
   puts "4. Update your profile"
   puts "5. Exit program"
-  gets.chomp
+  puts "Please select an option using the number:"
 end
 
 def run
@@ -63,45 +62,40 @@ def run
   welcome_message
   gets_user_data
   menu
-  puts "Please select an option using the number"
   input = gets.chomp
-  until input == 5
-    if num == 1
+  until input == "5"
+    if input == "1"
+      binding.pry
       auto_search
-      menu
-    elsif num == 2
-      search_arbitrary_criteria
-      menu
-    # elsif num == 3
+    elsif input == "2"
+      search_manual_entry
+    # elsif input == "3"
     #   #view and edit jobs
-    #   menu
-    # elsif num == 4
+    # elsif input == "4"
     #   #update profile
-    #   menu
     end
-    puts "Please select an option using the number"
+    menu
     input = gets.chomp
   end
   exit_program
 end
 
-def view_and_edit_jobs
-  jobs = User.last.saved_jobs
-  jobs.each_with_index do |job, index|
-    puts "#{index + 1}. #{job.title}"
-    puts job.description
-  end
-  puts "Would you like to delete jobs from your list?"
-  input = gets.chomp
-  if input.downcase == "yes" || "y"
-    puts "Which job would you like to delete?"
-    puts "1. Enter job number"
-  end
-end
+# def view_and_edit_jobs
+#   jobs = User.last.saved_jobs
+#   jobs.each_with_index do |job, index|
+#     puts "#{index + 1}. #{job.title}"
+#     puts job.description
+#   end
+#   puts "Would you like to delete jobs from your list?"
+#   input = gets.chomp
+#   if input.downcase == "yes" || "y"
+#     puts "Which job would you like to delete?"
+#     puts "1. Enter job number"
+#   end
+# end
 
 def exit_program
   puts "Goodbye!"
-  true
 end
 
 
@@ -128,7 +122,7 @@ def auto_search
    }
 end
 
-def search_arbitrary_criteria
+def search_manual_entry
   print "Please enter keywords for your search separated by spaces: "
   keywords = gets.chomp.split(' ').flatten
 
@@ -149,7 +143,7 @@ def search_arbitrary_criteria
     puts job.description
   }
 end
-  
+
 def skill_match_title?(keywords, job)
   keywords.any? {|word| job.title.include?(word)}
 end

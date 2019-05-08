@@ -10,7 +10,17 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_05_07_215146) do
+ActiveRecord::Schema.define(version: 2019_05_07_235526) do
+
+  create_table "jobs", force: :cascade do |t|
+    t.string "title"
+    t.string "position_type"
+    t.string "description"
+    t.string "url"
+    t.string "created_at"
+    t.string "company_url"
+    t.string "location"
+  end
 
   create_table "saved_jobs", force: :cascade do |t|
     t.integer "user_id"

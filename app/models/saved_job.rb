@@ -1,5 +1,4 @@
 class SavedJob < ActiveRecord::Base
-  belongs_to :jobs
-  belongs_to :users
-
-end 
+  belongs_to :job
+  belongs_to :user
+end

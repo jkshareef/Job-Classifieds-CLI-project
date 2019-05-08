@@ -27,6 +27,12 @@ def strip_tags s
    .gsub(/\s,/,',')
 end
 # binding.pry
-update_job_table
+# update_job_table
 
-puts 'Godspeed'
+jamal = User.new
+jamal.name = 'Jamal Shareef'
+jamal.skills = "Full Stack Web Developer"
+jamal.experience = 4
+jamal.location = 'Port Coquitlam, BC'
+jamal.save
+jamal.auto_search

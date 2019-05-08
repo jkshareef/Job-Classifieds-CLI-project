@@ -1,2 +1,5 @@
 class Job < ActiveRecord::Base
+  has_many :users, through: :saved_jobs
+  has_many :saved_jobs
+
 end

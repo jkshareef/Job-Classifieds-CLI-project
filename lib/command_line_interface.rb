@@ -90,7 +90,7 @@ def search_arbitrary_criteria
     puts job.description
   }
 end
-
+  
 def skill_match_title?(keywords, job)
   keywords.any? {|word| job.title.include?(word)}
 end
@@ -101,4 +101,16 @@ end
 
 def location_match?(job)
   job.location.downcase == User.last.location.downcase
+end
+
+def add_favorite(num)
+  new_job = SavedJob.create
+  new_job.user = User.last
+  new_job.job = Job.find(num)
+  User.last.saved_jobs << new_job
+  Job.find(num).saved_jobs << new_job
+end
+
+def add_interest(rating)
+  SavedJob.last.update(interest_level: rating)
 end

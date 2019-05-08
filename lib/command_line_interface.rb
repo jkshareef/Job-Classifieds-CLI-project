@@ -46,6 +46,34 @@ puts "     ______________
 `-----------------------'"
 end
 
+def choose_search
+  puts ' '
+  print 'Please enter whether you would like to search based on your current skill-set (1)
+or based on a list of skills you would like to enter manually (2)
+
+SEARCH TYPE: '
+
+  search_choice = gets.chomp
+
+  if search_choice == '2'
+    search_manual_entry
+  else
+    auto_search
+  end
+end
+
+def save_job_with_interest_rating
+  puts "Above is your list of jobs! In order to save a job (or multiple jobs) to your job list, please
+enter the 'Job Number' and rate your current level of interest in that listing!"
+
+  print "Job Number: "
+  job_number = gets.chomp
+  print "Curent level of interest on a scale of 1-10: "
+  job_rating = gets.chomp
+
+end
+
+
 
 
 def auto_search
@@ -69,7 +97,7 @@ def auto_search
    }
 end
 
-def search_arbitrary_criteria
+def search_manual_entry
   print "Please enter keywords for your search separated by spaces: "
   keywords = gets.chomp.split(' ').flatten
 
@@ -90,7 +118,7 @@ def search_arbitrary_criteria
     puts job.description
   }
 end
-  
+
 def skill_match_title?(keywords, job)
   keywords.any? {|word| job.title.include?(word)}
 end

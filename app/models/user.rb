@@ -51,4 +51,4 @@ class User < ActiveRecord::Base
 #      print job.description
 #   end
 #  end
-# end
+end

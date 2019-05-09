@@ -29,7 +29,7 @@ end
 
 def computer_ascii
   table = Terminal::Table.new do |t|
-    t << ["     ______________
+    t << ["      ______________
       /             /|
      /             / |
     /____________ /  |
@@ -70,6 +70,7 @@ def gets_user_data
 
   new_user = User.create
 
+  puts ' '
   print "Name: "
   new_user.update(name: gets.chomp)
   print "Skills: "
@@ -348,7 +349,7 @@ def view_average_interest_of_saved_job
       if input != "exit"
         puts
         puts "Average interest in this job is #{average_interest_level(input)}"
-      end 
+      end
     end
   end
 end

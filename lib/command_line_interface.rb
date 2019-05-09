@@ -108,7 +108,7 @@ def exit_program
 end
 
 def auto_search
-  keywords = User.last.skills.scan(/\w+/)
+  keywords = User.last.skills.split(/[^'’\p{L}\p{M}]+/)
 
    results = Job.all.select { |job|
      (skill_match_title?(keywords, job) || skill_match_description?(keywords, job)) && location_match?(job)
@@ -134,7 +134,7 @@ end
 
 def search_manual_entry
   print "Please enter keywords for your search separated by spaces: "
-  keywords = gets.chomp.split(' ').flatten
+  keywords = gets.chomp.str.split(/[^'’\p{L}\p{M}]+/)
 
   results = Job.all.select { |job|
     (skill_match_title?(keywords, job) || skill_match_description?(keywords, job)) && location_match?(job)
@@ -174,9 +174,9 @@ def save_job_with_interest_rating
   puts ' '
   puts '* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *'
   puts ' '
-  puts "Above is a list of jobs based on your search criteria! In order to save a job
-(or multiple jobs) to your job list, please enter the 'Job Number' and rate your
-current level of interest in that listing!"
+
+  puts "Above is a list of jobs based on your search criteria! In order to Apply or Save a job
+(or multiple jobs) to your job list, please enter the 'Job Number."
   puts ' '
   puts "Would you like to save any of the jobs listed above? please enter 'yes' if you would like
 to save any and 'no' if you would like to be redirected back to menu: "

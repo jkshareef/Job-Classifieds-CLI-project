@@ -404,7 +404,11 @@ def view_and_edit_jobs
       puts ' '
       puts '------------------------------------------------------------------------------------'
       puts ' '
-      puts "Job Number:#{saved_job.job.id}, #{saved_job.job.company}"
+      puts "Job Number: #{saved_job.job.id}"
+      puts ' '
+      puts "Title: #{saved_job.job.title}"
+      puts ' '
+      puts "Company: #{saved_job.job.company}"
       puts ' '
       puts "Location: #{saved_job.job.location}"
       puts ' '

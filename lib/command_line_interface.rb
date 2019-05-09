@@ -18,6 +18,8 @@ def run
       view_and_edit_jobs
     elsif input == "4"
      update_profile
+    elsif input == "5"
+      view_average_interest_of_saved_job
     end
     menu
     input = gets.chomp
@@ -313,5 +315,40 @@ def update_profile
   else
     puts "\nYou didn't update your profile"
     puts
+  end
+end
+
+def average_interest_level(job_num)
+  job = Job.find(job_num)
+  total = job.saved_jobs.sum {|saved_job| saved_job.interest_level}
+  total.to_f / job.saved_jobs.length
+end
+
+def view_average_interest_of_saved_job
+  if User.last.saved_jobs.empty? || User.last.saved_jobs == nil
+    puts ' '
+    puts "****You do not have any saved jobs to view.****"
+    puts ' '
+  else
+    jobs = User.last.saved_jobs
+    jobs.each_with_index do |saved_job, index|
+      puts ' '
+      puts '-------------------------------------------------------------------------'
+      puts ' '
+      puts "Job Number:#{saved_job.job.id}, #{saved_job.job.company}"
+      puts ' '
+      puts saved_job.job.description
+    end
+    input = nil
+    while input != "exit" do
+      puts
+      puts "Please enter a job id to view average interest level or type exit:"
+      puts
+      input = gets.chomp
+      if input != "exit"
+        puts
+        puts "Average interest in this job is #{average_interest_level(input)}"
+      end 
+    end
   end
 end

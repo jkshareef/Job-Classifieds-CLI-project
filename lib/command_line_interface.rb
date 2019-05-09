@@ -46,7 +46,7 @@ def computer_ascii
   | ::::::::::::::::  ::: |
   | ::::::::::::::[]  ::: |
   |   -----------     ::: |
-  `-----------------------'".colorize(:yellow)]
+  `-----------------------'".colorize(:green)]
   end
   table.style.width = 84
   table.align_column(0, :center)
@@ -56,8 +56,6 @@ end
 def welcome_message
   table = Terminal::Table.new do |t|
     t << ["In order for us to find the jobs best suited to you, we will ask you to quickly create a profile.".fit]
-    t << :separator
-    t.add_row ["We are going to ask you to enter your name, your skill-set (please enter all of your skills), your experience in your current field (in years), and the location in which you are searching for a job.".fit]
   end
   table.style.width = 84
   table.align_column(0, :center)
@@ -65,19 +63,17 @@ def welcome_message
   puts table
 end
 
-
 def gets_user_data
 
   new_user = User.create
 
-  puts ' '
-  print "Name: "
+  print "Enter your name: "
   new_user.update(name: gets.chomp)
-  print "Skills: "
+  print "Enter your skills: "
   new_user.update(skills: gets.chomp)
-  print "Experience: "
+  print "Enter Experience: "
   new_user.update(experience: gets.chomp)
-  print "Location: "
+  print "Enter default search location: "
   new_user.update(location: gets.chomp)
   puts ' '
 end
@@ -94,13 +90,12 @@ def menu
     t << :separator
     t.add_row ["5. View average interest in one of your saved jobs"]
     t << :separator
-    t.add_row ["Please select an option by reference number or 'quit' to exit: "]
   end
-  table.title = "=======MENU========="
+  table.title = "=====MENU=====".colorize(:green)
   table.style.width = 84
-  table.align_column(0, :center)
+  table.align_column(0, :left)
   puts table
-  puts "\n"
+  print "Please select an option by reference number or 'quit' to exit: "
 end
 
 def exit_program
@@ -204,7 +199,7 @@ to save any and 'no' if you would like to be redirected back to menu: "
             add_to_saved_jobs(job_number)
             break
           else
-            print "Whoops! that's not a valid input. Please enter a valid command: "
+            print "Whoops! that's not a valid input. Please enter a valid command: ".colorize(:red)
             job_number = gets.chomp
           end
         end
@@ -213,14 +208,11 @@ to save any and 'no' if you would like to be redirected back to menu: "
         job_rating = gets.chomp
         loop do
           if !(1..10).to_a.include?(job_rating.to_i)
-            print "Please enter a value between 1 and 10: "
+            print "Please enter a value between 1 and 10: ".colorize(:red)
             job_rating = gets.chomp
           elsif job_rating.to_i.to_s == job_rating
             add_interest_rating(job_rating)
             break
-          else
-            print "Whoops! that's not a valid input. Please enter a valid command: "
-            job_rating = gets.chomp
           end
         end
 
@@ -233,11 +225,11 @@ to save any and 'no' if you would like to be redirected back to menu: "
           break
         elsif status.downcase == 'yes'
         else
-          print "Whoops! that's not a valid input. Please enter a valid command: "
+          print "Whoops! that's not a valid input. Please enter a valid command: ".colorize(:red)
         end
       end
     else
-      print "Whoops! that's not a valid input. Please enter a valid command: "
+      print "Whoops! that's not a valid input. Please enter a valid command: ".colorize(:red)
     end
   end
   puts ' '
@@ -269,7 +261,7 @@ def view_and_edit_jobs
       puts "Job Number:#{saved_job.job.id}, #{saved_job.job.company}"
       puts ' '
       puts "Location: #{saved_job.job.location}"
-      puts
+      puts ' '
       table = Terminal::Table.new do |t|
         t << [saved_job.job.description.fit]
       end
@@ -300,9 +292,9 @@ def view_and_edit_jobs
             print "Please enter another job number or enter 'menu' to be redirected: "
           elsif input.to_i.to_s == input && !SavedJob.exists?(job_id: input, user_id: User.last.id)
             print "Whoops! it looks like you don't currently have that job saved.
-Please enter a valid job number: "
+Please enter a valid job number: ".colorize(:red)
           else
-            print "Whoops! that's not a valid input. Please enter a valid command: "
+            print "Whoops! that's not a valid input. Please enter a valid command: ".colorize(:red)
           end
         end
       end
@@ -311,32 +303,40 @@ Please enter a valid job number: "
 end
 
 def view_profile
-  puts "\nHere is your current profile:\nName: #{User.last.name}\nSkills: #{User.last.skills}\nExperience: #{User.last.experience}\nLocation: #{User.last.location}"
+  puts "\nHere is your current profile...\nName: #{User.last.name}\nSkills: #{User.last.skills}\nExperience: #{User.last.experience}\nLocation: #{User.last.location}"
 end
 
 def update_profile
-  view_profile
-  puts "\nYou can update your: \n 1. Skills \n 2. Experience \n 3. Location"
-  puts
-  puts "Please enter a number to update profile or type 'exit'"
-  puts
+  table = Terminal::Table.new do |t|
+    t << ["1. Skills: #{User.last.skills}".fit]
+    t << :separator
+    t.add_row ["2. Experience: #{User.last.experience}".fit]
+    t << :separator
+    t.add_row ["3. Default Search Location: #{User.last.location}".fit]
+  end
+  table.style.width = 84
+  table.align_column(0, :left)
+  table.title = "=====Current Profile=====".fit.colorize(:green)
+  puts table
+  print "Please enter the number associated with the category you would like to update or type 'exit' to exit: "
+
   input = gets.chomp
   if input == "1"
-    puts "Please enter new skills or type 'exit':"
+    print "Please enter please enter the full updated list of skills or 'exit' to exit: "
     puts ' '
     user_input = gets.chomp
     if user_input != "exit"
       User.last.update(skills: user_input)
       view_profile
       puts ' '
-      puts "\nYour skills have been updated!"
+      puts "Your skills have been updated!"
       puts ' '
     else
-      puts "\nYou didn't update your profile"
+      puts "Your profile has not been updated."
       puts ' '
     end
   elsif input == "2"
-    puts "Please enter new experience level in years or type 'exit':"
+    puts "Please enter current experience level in years to update experience or type 'exit' to exit:"
     puts ' '
     user_input = gets.chomp
     if user_input != "exit"
@@ -346,11 +346,11 @@ def update_profile
       puts "Your experience has been updated!"
       puts ' '
     else
-      puts "\nYou didn't update your profile"
+      puts "Your profile has not been updated."
       puts ' '
     end
   elsif input == "3"
-    puts "Please enter your new location or type 'exit':"
+    puts "Please update your default search location or type 'exit' to exit:"
     puts ' '
     user_input = gets.chomp
     if user_input != "exit"
@@ -360,11 +360,11 @@ def update_profile
       puts "Your location has been updated!"
       puts ' '
     else
-      puts "\nYou didn't update your profile"
+      puts "Your profile has not been updated."
       puts ' '
     end
   else
-    puts "\nYou didn't update your profile"
+    puts "Your profile has not been updated."
     puts ' '
   end
 end

@@ -12,8 +12,10 @@ def run
       auto_search
       save_job_with_interest_rating
     elsif input == "2"
-      search_manual_entry
-      save_job_with_interest_rating
+      return_value = search_manual_entry
+      if return_value
+        save_job_with_interest_rating
+      end
     elsif input == "3"
       view_and_edit_jobs
     elsif input == "4"
@@ -48,7 +50,7 @@ def computer_ascii
   | ::::::::::::::::  ::: |
   | ::::::::::::::[]  ::: |
   |   -----------     ::: |
-  `-----------------------'".colorize(:yellow)]
+  `-----------------------'".colorize(:green)]
   end
   table.style.width = 84
   table.align_column(0, :center)
@@ -58,8 +60,6 @@ end
 def welcome_message
   table = Terminal::Table.new do |t|
     t << ["In order for us to find the jobs best suited to you, we will ask you to quickly create a profile.".fit]
-    t << :separator
-    t.add_row ["We are going to ask you to enter your name, your skill-set (please enter all of your skills), your experience in your current field (in years), and the location in which you are searching for a job.".fit]
   end
   # table.style.width = 84
   table.align_column(0, :center)
@@ -67,19 +67,17 @@ def welcome_message
   puts table
 end
 
-
 def gets_user_data
 
   new_user = User.create
 
-  puts ' '
-  print "Name: "
+  print "Enter your name: "
   new_user.update(name: gets.chomp)
-  print "Skills: "
+  print "Enter your skills: "
   new_user.update(skills: gets.chomp)
-  print "Experience: "
+  print "Enter Experience: "
   new_user.update(experience: gets.chomp)
-  print "Location: "
+  print "Enter default search location: "
   new_user.update(location: gets.chomp)
   puts ' '
 end
@@ -99,11 +97,12 @@ def menu
       t << :separator
       t.add_row ["Please select an option by reference number or 'quit' to exit: "]
     end
-    table.title = "=======MENU========="
-    # table.style.width = 84
-    table.align_column(0, :center)
+    table.title = "=====MENU=====".colorize(:green)
+    table.align_column(0, :left)
     puts table
-    puts "\n"
+    puts
+    print "Please select an option by reference number or 'quit' to exit: "
+    puts
   else
     table = Terminal::Table.new do |t|
       t << ["1. Search for and save jobs by skillset"]
@@ -118,12 +117,11 @@ def menu
       t << :separator
       t.add_row [("6. View Interview Requests").colorize(:background => :green)]
       t << :separator
-      t.add_row ["Please select an option by reference number or 'quit' to exit: "]
     end
-    table.title = "=======MENU========="
-    # table.style.width = 84
-    table.align_column(0, :center)
+    table.title = "=====MENU=====".colorize(:green)
+    table.align_column(0, :left)
     puts table
+    print "Please select an option by reference number or 'quit' to exit: "
     puts
     table = Terminal::Table.new do |t|
       t << ['Congratulations, an Employer Has Reviewed Your Application and Would Like to Schedule an Interview! View Your Interviews Page to Begin a Technical Screening Interview'.colorize(:yellow).fit]
@@ -165,29 +163,118 @@ def auto_search
 end
 
 def search_manual_entry
-  print "Please enter keywords for your search separated by spaces: "
-  keywords = gets.chomp.str.split(/[^'’\p{L}\p{M}]+/)
+  puts "Would you like to search by location? (y/n)"
+  input = gets.chomp
+  if input == "y"
+    puts "Please enter a location:"
+    location = gets.chomp
+    results = Job.all.select { |job| location_match_arbitrary(job, location) }
+    results.each { |job|
+      puts ' '
+      print '------------------------------------------------------------------------------------'
+      puts ' '
+      puts "Job #{job.id}."
+      puts ' '
+      puts "<<<#{job.company}>>>"
+      puts "--#{job.title}--"
+      puts "..#{job.position_type}.."
+      puts ' '
+      puts "...#{job.location}..."
+      puts
+      table = Terminal::Table.new do |t|
+        t << [job.description.fit]
+      end
+      #table.style.width = 84
+      puts table
+    }
+  elsif input == "n"
+    puts "Would you like to search by skills? (y/n)"
+    input = gets.chomp
+    if input == "y"
+      puts "Please enter skills:"
+      skills = gets.chomp
+      keywords = skills.split(/[^'’\p{L}\p{M}]+/)
+      results = Job.all.select { |job|
+        (skill_match_title?(keywords, job) || skill_match_description?(keywords, job)) }
+      results.each { |job|
+        puts ' '
+        print '------------------------------------------------------------------------------------'
+        puts ' '
+        puts "Job #{job.id}."
+        puts ' '
+        puts "<<<#{job.company}>>>"
+        puts "--#{job.title}--"
+        puts "..#{job.position_type}.."
+        puts ' '
+        puts "...#{job.location}..."
+        puts
+        table = Terminal::Table.new do |t|
+          t << [job.description.fit]
+        end
+        #table.style.width = 86
+        puts table
+      }
+    elsif input == "n"
+      puts "Would you like to search by location and skills? (y/n)"
+      input = gets.chomp
+      if input == "y"
+        puts "Please enter a location:"
+        location = gets.chomp
+        puts "Please enter skills:"
+        skills = gets.chomp
+        keywords = skills.split(/[^'’\p{L}\p{M}]+/)
 
-  results = Job.all.select { |job|
-    (skill_match_title?(keywords, job) || skill_match_description?(keywords, job)) && location_match?(job)
-  }
-
-  results.each { |job|
-    puts ' '
-    print '------------------------------------------------------------------------------------'
-    puts ' '
-    puts "Job #{job.id}."
-    puts ' '
-    puts "<<<#{job.company}>>>"
-    puts "--#{job.title}--"
-    puts "..#{job.position_type}.."
-    puts ' '
-    table = Terminal::Table.new do |t|
-      t << [job.description.fit]
+        results = Job.all.select { |job|
+          (skill_match_title?(keywords, job) || skill_match_description?(keywords, job)) && location_match_arbitrary(job, location)
+        }
+        results.each { |job|
+          puts ' '
+          print '------------------------------------------------------------------------------------'
+          puts ' '
+          puts "Job #{job.id}."
+          puts ' '
+          puts "<<<#{job.company}>>>"
+          puts "--#{job.title}--"
+          puts "..#{job.position_type}.."
+          puts ' '
+          puts "...#{job.location}..."
+          puts
+          table = Terminal::Table.new do |t|
+            t << [job.description.fit]
+          end
+          #table.style.width = 84
+          puts table
+        }
+      elsif input == "n"
+        false
+      end
     end
-    # table.style.width = 84
-    puts table
-  }
+  end
+
+
+  # print "Please enter keywords for your search separated by spaces: "
+  # keywords = gets.chomp.str.split(/[^'’\p{L}\p{M}]+/)
+  #
+  # results = Job.all.select { |job|
+  #   (skill_match_title?(keywords, job) || skill_match_description?(keywords, job)) && location_match?(job)
+  # }
+  #
+  # results.each { |job|
+  #   puts ' '
+  #   print '------------------------------------------------------------------------------------'
+  #   puts ' '
+  #   puts "Job #{job.id}."
+  #   puts ' '
+  #   puts "<<<#{job.company}>>>"
+  #   puts "--#{job.title}--"
+  #   puts "..#{job.position_type}.."
+  #   puts ' '
+  #   table = Terminal::Table.new do |t|
+  #     t << [job.description.fit]
+  #   end
+  #   table.style.width = 84
+  #   puts table
+  # }
 end
 
 def skill_match_title?(keywords, job)
@@ -198,9 +285,9 @@ def skill_match_description?(keywords, job)
   keywords.any? {|word| job.description.downcase.include?(word.downcase)}
 end
 
-def location_match?(job)
-  job.location.downcase == User.last.location.downcase
-end
+# def location_match?(job)
+#   job.location.downcase == User.last.location.downcase
+# end
 
 def save_job_with_interest_rating
   puts ' '
@@ -210,8 +297,8 @@ def save_job_with_interest_rating
   puts "Above is a list of jobs based on your search criteria! In order to Apply or Save a job
 (or multiple jobs) to your job list, please enter the 'Job Number."
   puts ' '
-  puts "Would you like to save any of the jobs listed above? please enter 'yes' if you would like
-to save and and 'no' if you would like to be redirected back to menu: "
+  print "Would you like to save any of the jobs listed above? please enter 'yes' if you would like
+to save any and 'no' if you would like to be redirected back to menu: "
 
   search_desire = nil
 
@@ -250,7 +337,7 @@ to save and and 'no' if you would like to be redirected back to menu: "
               break
             end
           else
-            print "Whoops! that's not a valid input. Please enter a valid command: "
+            print "Whoops! that's not a valid input. Please enter a valid command: ".colorize(:red)
             job_number = gets.chomp
           end
         end
@@ -258,12 +345,12 @@ to save and and 'no' if you would like to be redirected back to menu: "
         print "Curent level of interest on a scale of 1-10: "
         job_rating = gets.chomp
         loop do
-          if job_rating.to_i.to_s == job_rating
+          if !(1..10).to_a.include?(job_rating.to_i)
+            print "Please enter a value between 1 and 10: ".colorize(:red)
+            job_rating = gets.chomp
+          elsif job_rating.to_i.to_s == job_rating
             add_interest_rating(job_rating)
             break
-          else
-            print "Whoops! that's not a valid input. Please enter a valid command: "
-            job_number = gets.chomp
           end
         end
 
@@ -276,11 +363,11 @@ to save and and 'no' if you would like to be redirected back to menu: "
           break
         elsif status.downcase == 'yes'
         else
-          print "Whoops! that's not a valid input. Please enter a valid command: "
+          print "Whoops! that's not a valid input. Please enter a valid command: ".colorize(:red)
         end
       end
     else
-      print "Whoops! that's not a valid input. Please enter a valid command: "
+      print "Whoops! that's not a valid input. Please enter a valid command: ".colorize(:red)
     end
   end
   puts ' '
@@ -320,7 +407,7 @@ def view_and_edit_jobs
       puts "Job Number:#{saved_job.job.id}, #{saved_job.job.company}"
       puts ' '
       puts "Location: #{saved_job.job.location}"
-      puts
+      puts ' '
       table = Terminal::Table.new do |t|
         t << [saved_job.job.description.fit]
       end
@@ -346,9 +433,14 @@ def view_and_edit_jobs
             break
           elsif SavedJob.exists?(job_id: input, user_id: User.last.id)
             SavedJob.find_by(job_id: input, user_id: User.last.id).destroy
+            print "That job has been removed!"
+            puts ' '
             print "Please enter another job number or enter 'menu' to be redirected: "
+          elsif input.to_i.to_s == input && !SavedJob.exists?(job_id: input, user_id: User.last.id)
+            print "Whoops! it looks like you don't currently have that job saved.
+Please enter a valid job number: ".colorize(:red)
           else
-            print "Whoops! that's not a valid input. Please enter a valid command: "
+            print "Whoops! that's not a valid input. Please enter a valid command: ".colorize(:red)
           end
         end
       end
@@ -357,32 +449,40 @@ def view_and_edit_jobs
 end
 
 def view_profile
-  puts "\nHere is your current profile:\nName: #{User.last.name}\nSkills: #{User.last.skills}\nExperience: #{User.last.experience}\nLocation: #{User.last.location}"
+  puts "\nHere is your current profile...\nName: #{User.last.name}\nSkills: #{User.last.skills}\nExperience: #{User.last.experience}\nLocation: #{User.last.location}"
 end
 
 def update_profile
-  view_profile
-  puts "\nYou can update your: \n 1. Skills \n 2. Experience \n 3. Location"
-  puts
-  puts "Please enter a number to update profile or type 'exit'"
-  puts
+  table = Terminal::Table.new do |t|
+    t << ["1. Skills: #{User.last.skills}".fit]
+    t << :separator
+    t.add_row ["2. Experience: #{User.last.experience}".fit]
+    t << :separator
+    t.add_row ["3. Default Search Location: #{User.last.location}".fit]
+  end
+  table.style.width = 84
+  table.align_column(0, :left)
+  table.title = "=====Current Profile=====".fit.colorize(:green)
+  puts table
+  print "Please enter the number associated with the category you would like to update or type 'exit' to exit: "
+
   input = gets.chomp
   if input == "1"
-    puts "Please enter new skills or type 'exit':"
+    print "Please enter please enter the full updated list of skills or 'exit' to exit: "
     puts ' '
     user_input = gets.chomp
     if user_input != "exit"
       User.last.update(skills: user_input)
       view_profile
       puts ' '
-      puts "\nYour skills have been updated!"
+      puts "Your skills have been updated!"
       puts ' '
     else
-      puts "\nYou didn't update your profile"
+      puts "Your profile has not been updated."
       puts ' '
     end
   elsif input == "2"
-    puts "Please enter new experience level in years or type 'exit':"
+    puts "Please enter current experience level in years to update experience or type 'exit' to exit:"
     puts ' '
     user_input = gets.chomp
     if user_input != "exit"
@@ -392,11 +492,11 @@ def update_profile
       puts "Your experience has been updated!"
       puts ' '
     else
-      puts "\nYou didn't update your profile"
+      puts "Your profile has not been updated."
       puts ' '
     end
   elsif input == "3"
-    puts "Please enter your new location or type 'exit':"
+    puts "Please update your default search location or type 'exit' to exit:"
     puts ' '
     user_input = gets.chomp
     if user_input != "exit"
@@ -406,11 +506,11 @@ def update_profile
       puts "Your location has been updated!"
       puts ' '
     else
-      puts "\nYou didn't update your profile"
+      puts "Your profile has not been updated."
       puts ' '
     end
   else
-    puts "\nYou didn't update your profile"
+    puts "Your profile has not been updated."
     puts ' '
   end
 end
@@ -456,6 +556,22 @@ end
 
 def location_match(job)
   user_location = User.last.location.downcase
+  job_location = job.location.downcase
+  user_arr = user_location.split(/[\s,]+/)
+  user_arr = user_arr.collect{|x| x.strip || x }
+  user_location = user_arr.join
+  job_arr = job_location.split(/[\s,]+/)
+  job_arr = job_arr.collect{|x| x.strip || x }
+  job_location = job_arr.join
+  if user_location.include?(job_location) || job_location.include?(user_location)
+    true
+  else
+    false
+  end
+end
+
+def location_match_arbitrary(job, location)
+  user_location = location.downcase
   job_location = job.location.downcase
   user_arr = user_location.split(/[\s,]+/)
   user_arr = user_arr.collect{|x| x.strip || x }

@@ -91,6 +91,8 @@ def menu
     t << :separator
     t.add_row ["4. Update your profile"]
     t << :separator
+    t.add_row ["5. View average interest in one of your saved jobs"]
+    t << :separator
     t.add_row ["Please select an option by reference number or 'quit' to exit: "]
   end
   table.title = "=======MENU========="
@@ -348,7 +350,7 @@ def view_average_interest_of_saved_job
       if input != "exit"
         puts
         puts "Average interest in this job is #{average_interest_level(input)}"
-      end 
+      end
     end
   end
 end

@@ -139,7 +139,7 @@ def auto_search
   keywords = User.last.skills.split(/[^'’\p{L}\p{M}]+/)
 
    results = Job.all.select { |job|
-     (skill_match_title?(keywords, job) || skill_match_description?(keywords, job)) && location_match(job)
+     (skill_match_title?(keywords, job) || skill_match_description?(keywords, job)) && location_match?(job, User.last.location.downcase)
    }
 
    results.each { |job|
@@ -168,7 +168,7 @@ def search_manual_entry
   if input == "y"
     puts "Please enter a location:"
     location = gets.chomp
-    results = Job.all.select { |job| location_match_arbitrary(job, location) }
+    results = Job.all.select { |job| location_match?(job, location) }
     results.each { |job|
       puts ' '
       print '------------------------------------------------------------------------------------'
@@ -225,7 +225,7 @@ def search_manual_entry
         keywords = skills.split(/[^'’\p{L}\p{M}]+/)
 
         results = Job.all.select { |job|
-          (skill_match_title?(keywords, job) || skill_match_description?(keywords, job)) && location_match_arbitrary(job, location)
+          (skill_match_title?(keywords, job) || skill_match_description?(keywords, job)) && location_match?(job, location)
         }
         results.each { |job|
           puts ' '
@@ -250,31 +250,6 @@ def search_manual_entry
       end
     end
   end
-
-
-  # print "Please enter keywords for your search separated by spaces: "
-  # keywords = gets.chomp.str.split(/[^'’\p{L}\p{M}]+/)
-  #
-  # results = Job.all.select { |job|
-  #   (skill_match_title?(keywords, job) || skill_match_description?(keywords, job)) && location_match?(job)
-  # }
-  #
-  # results.each { |job|
-  #   puts ' '
-  #   print '------------------------------------------------------------------------------------'
-  #   puts ' '
-  #   puts "Job #{job.id}."
-  #   puts ' '
-  #   puts "<<<#{job.company}>>>"
-  #   puts "--#{job.title}--"
-  #   puts "..#{job.position_type}.."
-  #   puts ' '
-  #   table = Terminal::Table.new do |t|
-  #     t << [job.description.fit]
-  #   end
-  #   table.style.width = 84
-  #   puts table
-  # }
 end
 
 def skill_match_title?(keywords, job)
@@ -285,9 +260,21 @@ def skill_match_description?(keywords, job)
   keywords.any? {|word| job.description.downcase.include?(word.downcase)}
 end
 
-# def location_match?(job)
-#   job.location.downcase == User.last.location.downcase
-# end
+def location_match?(job, location)
+  user_location = location.downcase
+  job_location = job.location.downcase
+  user_arr = user_location.split(/[\s,]+/)
+  user_arr = user_arr.collect{|x| x.strip || x }
+  user_location = user_arr.join
+  job_arr = job_location.split(/[\s,]+/)
+  job_arr = job_arr.collect{|x| x.strip || x }
+  job_location = job_arr.join
+  if user_location.include?(job_location) || job_location.include?(user_location)
+    true
+  else
+    false
+  end
+end
 
 def save_job_with_interest_rating
   puts ' '
@@ -583,36 +570,4 @@ end
 
 
 def view_interviews
-end
-
-def location_match(job)
-  user_location = User.last.location.downcase
-  job_location = job.location.downcase
-  user_arr = user_location.split(/[\s,]+/)
-  user_arr = user_arr.collect{|x| x.strip || x }
-  user_location = user_arr.join
-  job_arr = job_location.split(/[\s,]+/)
-  job_arr = job_arr.collect{|x| x.strip || x }
-  job_location = job_arr.join
-  if user_location.include?(job_location) || job_location.include?(user_location)
-    true
-  else
-    false
-  end
-end
-
-def location_match_arbitrary(job, location)
-  user_location = location.downcase
-  job_location = job.location.downcase
-  user_arr = user_location.split(/[\s,]+/)
-  user_arr = user_arr.collect{|x| x.strip || x }
-  user_location = user_arr.join
-  job_arr = job_location.split(/[\s,]+/)
-  job_arr = job_arr.collect{|x| x.strip || x }
-  job_location = job_arr.join
-  if user_location.include?(job_location) || job_location.include?(user_location)
-    true
-  else
-    false
-  end
 end

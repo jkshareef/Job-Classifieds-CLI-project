@@ -180,7 +180,7 @@ def save_job_with_interest_rating
   puts "Above is a list of jobs based on your search criteria! In order to Apply or Save a job
 (or multiple jobs) to your job list, please enter the 'Job Number."
   puts ' '
-  puts "Would you like to save any of the jobs listed above? please enter 'yes' if you would like
+  print "Would you like to save any of the jobs listed above? please enter 'yes' if you would like
 to save any and 'no' if you would like to be redirected back to menu: "
 
   search_desire = nil
@@ -212,12 +212,15 @@ to save any and 'no' if you would like to be redirected back to menu: "
         print "Curent level of interest on a scale of 1-10: "
         job_rating = gets.chomp
         loop do
-          if job_rating.to_i.to_s == job_rating
+          if !(1..10).to_a.include?(job_rating.to_i)
+            print "Please enter a value between 1 and 10: "
+            job_rating = gets.chomp
+          elsif job_rating.to_i.to_s == job_rating
             add_interest_rating(job_rating)
             break
           else
             print "Whoops! that's not a valid input. Please enter a valid command: "
-            job_number = gets.chomp
+            job_rating = gets.chomp
           end
         end
 
@@ -292,7 +295,12 @@ def view_and_edit_jobs
             break
           elsif SavedJob.exists?(job_id: input, user_id: User.last.id)
             SavedJob.find_by(job_id: input, user_id: User.last.id).destroy
+            print "That job has been removed!"
+            puts ' '
             print "Please enter another job number or enter 'menu' to be redirected: "
+          elsif input.to_i.to_s == input && !SavedJob.exists?(job_id: input, user_id: User.last.id)
+            print "Whoops! it looks like you don't currently have that job saved.
+Please enter a valid job number: "
           else
             print "Whoops! that's not a valid input. Please enter a valid command: "
           end

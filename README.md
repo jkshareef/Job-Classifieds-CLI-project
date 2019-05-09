@@ -21,20 +21,21 @@ macOS:
 
 ## Installation and Setup
 
-To download the CLI application clone the repository from GitHub and change your current directory to the cloned repository
+To download the CLI application clone the repository from GitHub and change your current directory to the cloned repository.
 
-Next you will need to install a few gems. Run the following in your terminal from the top of the project directory:
+Next you will need to install a few things. Run the following in your terminal from the top of the project directory:
 
 
 ```ruby
-run setup.rb #installs dependencies  
+ruby setup.rb #installs dependencies  
+
 bundle install #this will install all required gems
 ```
 
-Next you will need to setup the database. Run the following commands in your terminal at the top of the directory:
+Next you will need to setup the database. Run the following command in your terminal at the top of the directory:
 
 ```ruby
-rake db:setup_db
+rake setup_db
 ```
 
 
@@ -52,11 +53,30 @@ ruby bin/run.rb
 
 The main menu will display options for commands you can make to the program. If you would like to exit out of the program from the main menu just type quit.
 
+Program menu:
+
 ![Menu Screenshot](./images/main-menu.png)
 
 Below you will find a video that demonstrates how you can use the program:
 
 ---insert video here---
+
+###### Note:
+If you would like to refresh the job postings, you will need to delete the database (development.db) from your computer and re-seed the data by entering the following command:
+
+```ruby
+rake setup_db
+```
+
+ Be aware that deleting the database will delete all of the user profile info you have entered in the application as well as any saved jobs you may have.
+
+## Uninstalling the Program
+
+If you would like to uninstall the dependencies after use enter the following command at the top of the directory:
+
+```
+ruby uninstall.rb
+```
 
 
 

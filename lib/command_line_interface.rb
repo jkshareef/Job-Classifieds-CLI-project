@@ -1,4 +1,5 @@
 require_all './app/models'
+require 'word_wrap/core_ext'
 
 def run
   computer_ascii
@@ -25,41 +26,47 @@ def run
 end
 
 def computer_ascii
-  puts "     ______________
-    /             /|
-   /             / |
-  /____________ /  |
-  | ___________ |  |
-  ||           ||  |
-  ||           ||  |
-  ||           ||  |
-  ||___________||  |
-  |   _______   |  /
- /|  (_______)  | /
-( |_____________|/
-'\'
-.=======================.
-| ::::::::::::::::  ::: |
-| ::::::::::::::[]  ::: |
-|   -----------     ::: |
-`-----------------------'"
+  table = Terminal::Table.new do |t|
+    t << ["     ______________
+      /             /|
+     /             / |
+    /____________ /  |
+    | ___________ |  |
+    ||           ||  |
+    ||           ||  |
+    ||           ||  |
+    ||___________||  |
+    |   _______   |  /
+   /|  (_______)  | /
+  ( |_____________|/
+  '\'
+  .=======================.
+  | ::::::::::::::::  ::: |
+  | ::::::::::::::[]  ::: |
+  |   -----------     ::: |
+  `-----------------------'".colorize(:yellow)]
+  end
+  table.style.width = 84
+  table.align_column(0, :center)
+  puts table
 end
 
 def welcome_message
-  puts "Hello job seeker! Welcome to SMARTER CLASSIFIEDS!
-
-In order for us to find the jobs best suited to you, we will ask you to quickly create a
-profile.
-
-In order, we are going to ask you to enter your name, your skill-set (please enter all of
-your skills separated by spaces), your experience in your current field (in years), and the
-location in which you are searching for a job. "
+  table = Terminal::Table.new do |t|
+    t << ["In order for us to find the jobs best suited to you, we will ask you to quickly create a profile.".fit]
+    t << :separator
+    t.add_row ["We are going to ask you to enter your name, your skill-set (please enter all of your skills), your experience in your current field (in years), and the location in which you are searching for a job.".fit]
+  end
+  table.style.width = 84
+  table.align_column(0, :center)
+  table.title = "Hello job seeker! Welcome to SMARTER CLASSIFIEDS!.".fit
+  puts table
 end
 
 
 def gets_user_data
 
-  new_user = User.create()
+  new_user = User.create
 
   print "Name: "
   new_user.update(name: gets.chomp)
@@ -73,12 +80,22 @@ def gets_user_data
 end
 
 def menu
-  puts "=======MENU========="
-  puts "1. Search for jobs by skillset"
-  puts "2. Search for jobs by custom criteria"
-  puts "3. View and edit saved jobs"
-  puts "4. Update your profile"
-  print "Please select an option by reference number or 'quit' to exit: "
+  table = Terminal::Table.new do |t|
+    t << ["1. Search for jobs by skillset"]
+    t << :separator
+    t.add_row ["2. Search for jobs by custom criteria"]
+    t << :separator
+    t.add_row ["3. View and edit saved jobs"]
+    t << :separator
+    t.add_row ["4. Update your profile"]
+    t << :separator
+    t.add_row ["Please select an option by reference number or 'quit' to exit: "]
+  end
+  table.title = "=======MENU========="
+  table.style.width = 84
+  table.align_column(0, :center)
+  puts table
+  puts "\n"
 end
 
 def exit_program
@@ -94,7 +111,7 @@ def auto_search
 
    results.each { |job|
      puts ' '
-     print '---------------------------------------------------------------------------------------------'
+     print '------------------------------------------------------------------------------------'
      puts ' '
      puts "Job #{job.id}."
      puts ' '
@@ -102,7 +119,11 @@ def auto_search
      puts "--#{job.title}--"
      puts "..#{job.position_type}.."
      puts ' '
-     puts job.description
+     table = Terminal::Table.new do |t|
+       t << [job.description.fit]
+     end
+     table.style.width = 84
+     puts table
    }
 end
 
@@ -116,7 +137,7 @@ def search_manual_entry
 
   results.each { |job|
     puts ' '
-    print '---------------------------------------------------------------------------------------------'
+    print '------------------------------------------------------------------------------------'
     puts ' '
     puts "Job #{job.id}."
     puts ' '
@@ -124,7 +145,11 @@ def search_manual_entry
     puts "--#{job.title}--"
     puts "..#{job.position_type}.."
     puts ' '
-    puts job.description
+    table = Terminal::Table.new do |t|
+      t << [job.description.fit]
+    end
+    table.style.width = 84
+    puts table
   }
 end
 
@@ -142,7 +167,7 @@ end
 
 def save_job_with_interest_rating
   puts ' '
-  puts '* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *'
+  puts '* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *'
   puts ' '
   puts "Above is a list of jobs based on your search criteria! In order to save a job
 (or multiple jobs) to your job list, please enter the 'Job Number' and rate your
@@ -193,14 +218,18 @@ def view_and_edit_jobs
     jobs = User.last.saved_jobs
     jobs.each_with_index do |saved_job, index|
       puts ' '
-      puts '-------------------------------------------------------------------------'
+      puts '------------------------------------------------------------------------------------'
       puts ' '
       puts "Job Number:#{saved_job.job.id}, #{saved_job.job.company}"
       puts ' '
-      puts saved_job.job.description
+      table = Terminal::Table.new do |t|
+        t << [saved_job.job.description.fit]
+      end
+      table.style.width = 84
+      puts table
     end
     puts ' '
-    print "Would you like to delete some jobs from your saved list? Please enter 'yes' or 'no': "
+    print "Would you like to delete some jobs from your saved list? Please enter 'yes' or 'no': ".fit 84
     input = gets.chomp
     if input.downcase == 'yes'
       puts ' '

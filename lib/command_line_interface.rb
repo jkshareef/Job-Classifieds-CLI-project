@@ -111,7 +111,7 @@ def auto_search
   keywords = User.last.skills.split(/[^'’\p{L}\p{M}]+/)
 
    results = Job.all.select { |job|
-     (skill_match_title?(keywords, job) || skill_match_description?(keywords, job)) && location_match?(job)
+     (skill_match_title?(keywords, job) || skill_match_description?(keywords, job)) && location_match(job)
    }
 
    results.each { |job|
@@ -124,6 +124,8 @@ def auto_search
      puts "--#{job.title}--"
      puts "..#{job.position_type}.."
      puts ' '
+     puts "...#{job.location}..."
+     puts
      table = Terminal::Table.new do |t|
        t << [job.description.fit]
      end
@@ -263,6 +265,8 @@ def view_and_edit_jobs
       puts ' '
       puts "Job Number:#{saved_job.job.id}, #{saved_job.job.company}"
       puts ' '
+      puts "Location: #{saved_job.job.location}"
+      puts
       table = Terminal::Table.new do |t|
         t << [saved_job.job.description.fit]
       end
@@ -389,5 +393,21 @@ def view_average_interest_of_saved_job
         puts "Average interest in this job is #{average_interest_level(input)}"
       end
     end
+  end
+end
+
+def location_match(job)
+  user_location = User.last.location.downcase
+  job_location = job.location.downcase
+  user_arr = user_location.split(/[\s,]+/)
+  user_arr = user_arr.collect{|x| x.strip || x }
+  user_location = user_arr.join
+  job_arr = job_location.split(/[\s,]+/)
+  job_arr = job_arr.collect{|x| x.strip || x }
+  job_location = job_arr.join
+  if user_location.include?(job_location) || job_location.include?(user_location)
+    true
+  else
+    false
   end
 end

@@ -27,7 +27,7 @@ def strip_tags s
    .gsub(/\s,/,',')
 end
 # binding.pry
-#update_job_table
+update_job_table
 
 # jamal = User.new
 # jamal.name = 'Jamal Shareef'

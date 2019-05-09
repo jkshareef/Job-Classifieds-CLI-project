@@ -92,6 +92,8 @@ def menu
     t << :separator
     t.add_row ["4. Update your profile"]
     t << :separator
+    t.add_row ["5. View average interest in one of your saved jobs"]
+    t << :separator
     t.add_row ["Please select an option by reference number or 'quit' to exit: "]
   end
   table.title = "=======MENU========="

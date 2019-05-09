@@ -84,9 +84,9 @@ end
 
 def menu
   table = Terminal::Table.new do |t|
-    t << ["1. Search for jobs by skillset"]
+    t << ["1. Search for and save jobs by skillset"]
     t << :separator
-    t.add_row ["2. Search for jobs by custom criteria"]
+    t.add_row ["2. Search for and save jobs by custom criteria"]
     t << :separator
     t.add_row ["3. View and edit saved jobs"]
     t << :separator
@@ -177,28 +177,64 @@ def save_job_with_interest_rating
   puts "Above is a list of jobs based on your search criteria! In order to save a job
 (or multiple jobs) to your job list, please enter the 'Job Number' and rate your
 current level of interest in that listing!"
+  puts ' '
+  puts "Would you like to save any of the jobs listed above? please enter 'yes' if you would like
+to save any and 'no' if you would like to be redirected back to menu: "
 
-  i = 1
+  search_desire = nil
 
-  while i == 1
-    puts ' '
-    print "Job Number: "
-    job_number = gets.chomp
-    print "Curent level of interest on a scale of 1-10: "
-    job_rating = gets.chomp
+  loop do
+    if search_desire == 'no'
+      break
+    else
+      search_desire = gets.chomp
+    end
+    if search_desire.downcase == 'no'
+      break
+    elsif search_desire.downcase == 'yes'
 
-    add_to_saved_jobs(job_number)
-    add_interest_rating(job_rating)
+      loop do
+        puts ' '
+        print "Job Number: "
+        job_number = gets.chomp
+        loop do
+          if job_number.to_i.to_s == job_number
+            add_to_saved_jobs(job_number)
+            break
+          else
+            print "Whoops! that's not a valid input. Please enter a valid command: "
+            job_number = gets.chomp
+          end
+        end
 
-    puts ' '
-    print "Would you like to add another job? Please enter 'yes' or 'no': "
-    status = gets.chomp
+        print "Curent level of interest on a scale of 1-10: "
+        job_rating = gets.chomp
+        loop do
+          if job_rating.to_i.to_s == job_rating
+            add_interest_rating(job_rating)
+            break
+          else
+            print "Whoops! that's not a valid input. Please enter a valid command: "
+            job_number = gets.chomp
+          end
+        end
 
-    if status.downcase == 'no'
-      i = 0
+        puts ' '
+        print "Would you like to add another job? Please enter 'yes' or 'no': "
+        status = gets.chomp
+
+        if status.downcase == 'no'
+          search_desire = 'no'
+          break
+        elsif status.downcase == 'yes'
+        else
+          print "Whoops! that's not a valid input. Please enter a valid command: "
+        end
+      end
+    else
+      print "Whoops! that's not a valid input. Please enter a valid command: "
     end
   end
-
   puts ' '
 end
 
@@ -275,49 +311,49 @@ def update_profile
   input = gets.chomp
   if input == "1"
     puts "Please enter new skills or type 'exit':"
-    puts
+    puts ' '
     user_input = gets.chomp
     if user_input != "exit"
       User.last.update(skills: user_input)
       view_profile
-      puts
+      puts ' '
       puts "\nYour skills have been updated!"
-      puts
+      puts ' '
     else
       puts "\nYou didn't update your profile"
-      puts
+      puts ' '
     end
   elsif input == "2"
     puts "Please enter new experience level in years or type 'exit':"
-    puts
+    puts ' '
     user_input = gets.chomp
     if user_input != "exit"
       User.last.update(experience: user_input)
       view_profile
-      puts
+      puts ' '
       puts "Your experience has been updated!"
-      puts
+      puts ' '
     else
       puts "\nYou didn't update your profile"
-      puts
+      puts ' '
     end
   elsif input == "3"
     puts "Please enter your new location or type 'exit':"
-    puts
+    puts ' '
     user_input = gets.chomp
     if user_input != "exit"
       User.last.update(location: user_input)
       view_profile
-      puts
+      puts ' '
       puts "Your location has been updated!"
-      puts
+      puts ' '
     else
       puts "\nYou didn't update your profile"
-      puts
+      puts ' '
     end
   else
     puts "\nYou didn't update your profile"
-    puts
+    puts ' '
   end
 end
 
@@ -344,12 +380,12 @@ def view_average_interest_of_saved_job
     end
     input = nil
     while input != "exit" do
-      puts
+      puts ' '
       puts "Please enter a job id to view average interest level or type exit:"
-      puts
+      puts ' '
       input = gets.chomp
       if input != "exit"
-        puts
+        puts ' '
         puts "Average interest in this job is #{average_interest_level(input)}"
       end
     end

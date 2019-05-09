@@ -27,17 +27,14 @@ Next you will need to install a few gems. Run the following in your terminal fro
 
 
 ```ruby
+run setup.rb #installs dependencies  
 bundle install #this will install all required gems
 ```
 
 Next you will need to setup the database. Run the following commands in your terminal at the top of the directory:
 
 ```ruby
-rake db:migrate
-```
-And then...
-```ruby
-rake db:seed #this will seed our database with jobs
+rake db:setup_db
 ```
 
 

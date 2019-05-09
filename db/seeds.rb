@@ -30,7 +30,7 @@ end
 
 def fake_user_data
   positions = Job.all.size
-  seekers = positions * 3
+  seekers = positions * 2
   seekers.times do
     seeker = User.new
     seeker.name = Faker::Name.unique.name
@@ -42,7 +42,7 @@ def fake_user_data
 end
 
 def fake_add_to_saved_jobs_and_interviews(id)
-  rand(1..7).times do
+  rand(1..3).times do
     job_num = rand(1..350)
     new_job = SavedJob.create
     new_job.user = User.find(id)

@@ -26,12 +26,11 @@ def strip_tags s
    .join(' ')
    .gsub(/\s,/,',')
 end
-# binding.pry
 
 
 def fake_user_data
   positions = Job.all.size
-  seekers = positions * 2
+  seekers = positions * 3
   seekers.times do
     seeker = User.new
     seeker.name = Faker::Name.unique.name
@@ -42,7 +41,7 @@ def fake_user_data
   end
 end
 
-def fake_add_to_saved_jobs(id)
+def fake_add_to_saved_jobs_and_interviews(id)
   rand(1..7).times do
     job_num = rand(1..350)
     new_job = SavedJob.create
@@ -51,11 +50,16 @@ def fake_add_to_saved_jobs(id)
     new_job.interest_level = rand(1..10)
     User.find(id).saved_jobs << new_job
     Job.find(job_num).saved_jobs << new_job
+    interview = Interview.create
+    interview.user = User.find(id)
+    interview.job = Job.find(job_num)
+    User.find(id).interviews << interview
+    Job.find(job_num).interviews << interview
   end
 end
 
 def fake_user_actions
-  User.all.each {|user| fake_add_to_saved_jobs(user.id)}
+  User.all.each {|user| fake_add_to_saved_jobs_and_interviews(user.id)}
 end
 
 

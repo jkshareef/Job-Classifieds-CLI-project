@@ -139,7 +139,7 @@ def auto_search
   keywords = User.last.skills.split(/[^'’\p{L}\p{M}]+/)
 
    results = Job.all.select { |job|
-     (skill_match_title?(keywords, job) || skill_match_description?(keywords, job)) && location_match(job)
+     (skill_match_title?(keywords, job) || skill_match_description?(keywords, job)) && location_match?(job, User.last.location.downcase)
    }
    print_search_results(results)
 end
@@ -172,7 +172,7 @@ def search_manual_entry
   if input == "y"
     puts "Please enter a location:"
     location = gets.chomp
-    results = Job.all.select { |job| location_match_arbitrary(job, location) }
+    results = Job.all.select { |job| location_match?(job, location) }
     print_search_results(results)
   elsif input == "n"
     puts "Would you like to search by skills? (y/n)"
@@ -194,7 +194,7 @@ def search_manual_entry
         skills = gets.chomp
         keywords = skills.split(/[^'’\p{L}\p{M}]+/)
         results = Job.all.select { |job|
-          (skill_match_title?(keywords, job) || skill_match_description?(keywords, job)) && location_match_arbitrary(job, location)
+          (skill_match_title?(keywords, job) || skill_match_description?(keywords, job)) && location_match?(job, location)
         }
         print_search_results(results)
       elsif input == "n"
@@ -210,6 +210,22 @@ end
 
 def skill_match_description?(keywords, job)
   keywords.any? {|word| job.description.downcase.include?(word.downcase)}
+end
+
+def location_match?(job, location)
+  user_location = location.downcase
+  job_location = job.location.downcase
+  user_arr = user_location.split(/[\s,]+/)
+  user_arr = user_arr.collect{|x| x.strip || x }
+  user_location = user_arr.join
+  job_arr = job_location.split(/[\s,]+/)
+  job_arr = job_arr.collect{|x| x.strip || x }
+  job_location = job_arr.join
+  if user_location.include?(job_location) || job_location.include?(user_location)
+    true
+  else
+    false
+  end
 end
 
 def save_job_with_interest_rating
@@ -506,36 +522,4 @@ end
 
 
 def view_interviews
-end
-
-def location_match(job)
-  user_location = User.last.location.downcase
-  job_location = job.location.downcase
-  user_arr = user_location.split(/[\s,]+/)
-  user_arr = user_arr.collect{|x| x.strip || x }
-  user_location = user_arr.join
-  job_arr = job_location.split(/[\s,]+/)
-  job_arr = job_arr.collect{|x| x.strip || x }
-  job_location = job_arr.join
-  if user_location.include?(job_location) || job_location.include?(user_location)
-    true
-  else
-    false
-  end
-end
-
-def location_match_arbitrary(job, location)
-  user_location = location.downcase
-  job_location = job.location.downcase
-  user_arr = user_location.split(/[\s,]+/)
-  user_arr = user_arr.collect{|x| x.strip || x }
-  user_location = user_arr.join
-  job_arr = job_location.split(/[\s,]+/)
-  job_arr = job_arr.collect{|x| x.strip || x }
-  job_location = job_arr.join
-  if user_location.include?(job_location) || job_location.include?(user_location)
-    true
-  else
-    false
-  end
 end

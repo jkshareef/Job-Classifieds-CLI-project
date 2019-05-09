@@ -12,6 +12,7 @@ gem "word_wrap"
 gem "colorize"
 gem "artii"
 gem "terminal-table"
+gem "faker"
 
 
 group :imagemagick do

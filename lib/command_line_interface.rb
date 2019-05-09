@@ -108,7 +108,7 @@ def exit_program
 end
 
 def auto_search
-  keywords = User.last.skills.scan(/\w+/)
+  keywords = User.last.skills.split(/[^'’\p{L}\p{M}]+/)
 
    results = Job.all.select { |job|
      (skill_match_title?(keywords, job) || skill_match_description?(keywords, job)) && location_match?(job)
@@ -134,7 +134,7 @@ end
 
 def search_manual_entry
   print "Please enter keywords for your search separated by spaces: "
-  keywords = gets.chomp.split(' ').flatten
+  keywords = gets.chomp.str.split(/[^'’\p{L}\p{M}]+/)
 
   results = Job.all.select { |job|
     (skill_match_title?(keywords, job) || skill_match_description?(keywords, job)) && location_match?(job)

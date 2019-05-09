@@ -27,12 +27,39 @@ def strip_tags s
    .gsub(/\s,/,',')
 end
 # binding.pry
-update_job_table
 
-# jamal = User.new
-# jamal.name = 'Jamal Shareef'
-# jamal.skills = "Full Stack Web Developer"
-# jamal.experience = 4
-# jamal.location = 'Port Coquitlam, BC'
-# jamal.save
-# jamal.auto_search
+
+def fake_user_data
+  positions = Job.all.size
+  seekers = positions * 2
+  seekers.times do
+    seeker = User.new
+    seeker.name = Faker::Name.unique.name
+    seeker.skills = Skills.sample(8).join(' ')
+    seeker.experience = rand(0..20)
+    seeker.location = Locations.sample
+    seeker.save
+  end
+end
+
+def fake_add_to_saved_jobs(id)
+  rand(1..7).times do
+    job_num = rand(1..350)
+    new_job = SavedJob.create
+    new_job.user = User.find(id)
+    new_job.job = Job.find(job_num)
+    new_job.interest_level = rand(1..10)
+    User.find(id).saved_jobs << new_job
+    Job.find(job_num).saved_jobs << new_job
+  end
+end
+
+def fake_user_actions
+  User.all.each {|user| fake_add_to_saved_jobs(user.id)}
+end
+
+
+
+update_job_table
+fake_user_data
+fake_user_actions

@@ -475,7 +475,7 @@ def update_profile
       break
     elsif search_desire == nil
       search_desire = gets.chomp
-    else
+    elsif search_desire == 'y'
         puts ' '
         print "Please enter the reference number for the element you would like to update: "
         input = gets.chomp
@@ -535,7 +535,11 @@ def update_profile
       elsif search_desire == 'y'
       else
         print "Whoops! that's not a valid input. Please enter a valid command: ".colorize(:red)
+        search_desire = gets.chomp
       end
+    else
+      print "Whoops! that's not a valid input. Please enter a valid command: ".colorize(:red)
+      search_desire = gets.chomp
     end
   end
   puts ' '

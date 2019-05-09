@@ -141,25 +141,29 @@ def auto_search
    results = Job.all.select { |job|
      (skill_match_title?(keywords, job) || skill_match_description?(keywords, job)) && location_match?(job, User.last.location.downcase)
    }
+   print_search_results(results)
+end
 
-   results.each { |job|
-     puts ' '
-     print '------------------------------------------------------------------------------------'
-     puts ' '
-     puts "Job #{job.id}."
-     puts ' '
-     puts "<<<#{job.company}>>>"
-     puts "--#{job.title}--"
-     puts "..#{job.position_type}.."
-     puts ' '
-     puts "...#{job.location}..."
-     puts
-     table = Terminal::Table.new do |t|
-       t << [job.description.fit]
-     end
-     # table.style.width = 84
-     puts table
-   }
+def print_search_results(results)
+  results.each { |job|
+    puts ' '
+    print '------------------------------------------------------------------------------------'
+    puts ' '
+    puts "Job #{job.id}."
+    puts ' '
+    puts "<<<#{job.company}>>>"
+    puts " "
+    puts "--#{job.title}--"
+    puts " "
+    puts "..#{job.position_type}.."
+    puts ' '
+    puts "...#{job.location}..."
+    puts
+    table = Terminal::Table.new do |t|
+      t << [job.description.fit]
+  end
+  puts table
+  }
 end
 
 def search_manual_entry
@@ -169,24 +173,7 @@ def search_manual_entry
     puts "Please enter a location:"
     location = gets.chomp
     results = Job.all.select { |job| location_match?(job, location) }
-    results.each { |job|
-      puts ' '
-      print '------------------------------------------------------------------------------------'
-      puts ' '
-      puts "Job #{job.id}."
-      puts ' '
-      puts "<<<#{job.company}>>>"
-      puts "--#{job.title}--"
-      puts "..#{job.position_type}.."
-      puts ' '
-      puts "...#{job.location}..."
-      puts
-      table = Terminal::Table.new do |t|
-        t << [job.description.fit]
-      end
-      #table.style.width = 84
-      puts table
-    }
+    print_search_results(results)
   elsif input == "n"
     puts "Would you like to search by skills? (y/n)"
     input = gets.chomp
@@ -196,24 +183,7 @@ def search_manual_entry
       keywords = skills.split(/[^'’\p{L}\p{M}]+/)
       results = Job.all.select { |job|
         (skill_match_title?(keywords, job) || skill_match_description?(keywords, job)) }
-      results.each { |job|
-        puts ' '
-        print '------------------------------------------------------------------------------------'
-        puts ' '
-        puts "Job #{job.id}."
-        puts ' '
-        puts "<<<#{job.company}>>>"
-        puts "--#{job.title}--"
-        puts "..#{job.position_type}.."
-        puts ' '
-        puts "...#{job.location}..."
-        puts
-        table = Terminal::Table.new do |t|
-          t << [job.description.fit]
-        end
-        #table.style.width = 86
-        puts table
-      }
+      print_search_results(results)
     elsif input == "n"
       puts "Would you like to search by location and skills? (y/n)"
       input = gets.chomp
@@ -223,28 +193,10 @@ def search_manual_entry
         puts "Please enter skills:"
         skills = gets.chomp
         keywords = skills.split(/[^'’\p{L}\p{M}]+/)
-
         results = Job.all.select { |job|
           (skill_match_title?(keywords, job) || skill_match_description?(keywords, job)) && location_match?(job, location)
         }
-        results.each { |job|
-          puts ' '
-          print '------------------------------------------------------------------------------------'
-          puts ' '
-          puts "Job #{job.id}."
-          puts ' '
-          puts "<<<#{job.company}>>>"
-          puts "--#{job.title}--"
-          puts "..#{job.position_type}.."
-          puts ' '
-          puts "...#{job.location}..."
-          puts
-          table = Terminal::Table.new do |t|
-            t << [job.description.fit]
-          end
-          #table.style.width = 84
-          puts table
-        }
+        print_search_results(results)
       elsif input == "n"
         false
       end

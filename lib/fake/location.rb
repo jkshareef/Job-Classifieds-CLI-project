@@ -1,0 +1,1 @@
+Locations = ['Seattle, WA', 'Cupertino, CA', 'Los Angeles, CA', 'San Francisco, CA', 'New York, NY', 'London', 'Bethesda, MD', 'Hamburg', 'Mountain View, CA', 'Hollywood', 'Austin, TX', 'Dallas, TX', 'Palo Alto, CA', 'Stockholm', 'Atlanta', 'San Francisco', 'Boston, MA', 'Chicago']

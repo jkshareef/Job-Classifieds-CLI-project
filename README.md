@@ -52,7 +52,7 @@ ruby bin/run.rb
 
 The main menu will display options for commands you can make to the program. If you would like to exit out of the program from the main menu just type quit.
 
----screenshot of main menu---
+![Menu Screenshot](./images/main-menu.png)
 
 Below you will find a video that demonstrates how you can use the program:
 

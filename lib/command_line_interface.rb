@@ -171,9 +171,8 @@ def save_job_with_interest_rating
   puts ' '
   puts '* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *'
   puts ' '
-  puts "Above is a list of jobs based on your search criteria! In order to save a job
-(or multiple jobs) to your job list, please enter the 'Job Number' and rate your
-current level of interest in that listing!"
+  puts "Above is a list of jobs based on your search criteria! In order to Apply or Save a job
+(or multiple jobs) to your job list, please enter the 'Job Number."
 
   i = 1
 
@@ -181,11 +180,15 @@ current level of interest in that listing!"
     puts ' '
     print "Job Number: "
     job_number = gets.chomp
-    print "Curent level of interest on a scale of 1-10: "
+    print "Curent level of interest on a scale of 1-10: (or 'skip')"
     job_rating = gets.chomp
-
     add_to_saved_jobs(job_number)
-    add_interest_rating(job_rating)
+
+    if job_rating.downcase != 'skip'
+      add_interest_rating(job_rating)
+    elsif !(1..10).to_a.include?(job_rating)
+      puts "Please enter a value between 1 and 10"
+    end
 
     puts ' '
     print "Would you like to add another job? Please enter 'yes' or 'no': "
@@ -348,7 +351,7 @@ def view_average_interest_of_saved_job
       if input != "exit"
         puts
         puts "Average interest in this job is #{average_interest_level(input)}"
-      end 
+      end
     end
   end
 end

@@ -29,7 +29,7 @@ end
 
 def computer_ascii
   table = Terminal::Table.new do |t|
-    t << ["     ______________
+    t << ["      ______________
       /             /|
      /             / |
     /____________ /  |
@@ -70,6 +70,7 @@ def gets_user_data
 
   new_user = User.create
 
+  puts ' '
   print "Name: "
   new_user.update(name: gets.chomp)
   print "Skills: "
@@ -90,6 +91,8 @@ def menu
     t.add_row ["3. View and edit saved jobs"]
     t << :separator
     t.add_row ["4. Update your profile"]
+    t << :separator
+    t.add_row ["5. View average interest in one of your saved jobs"]
     t << :separator
     t.add_row ["Please select an option by reference number or 'quit' to exit: "]
   end

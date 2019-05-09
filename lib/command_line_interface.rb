@@ -20,6 +20,8 @@ def run
      update_profile
     elsif input == "5"
       view_average_interest_of_saved_job
+    elsif input == "6" && !User.last.interviews.empty?
+      view_interviews
     end
     menu
     input = gets.chomp
@@ -59,7 +61,7 @@ def welcome_message
     t << :separator
     t.add_row ["We are going to ask you to enter your name, your skill-set (please enter all of your skills), your experience in your current field (in years), and the location in which you are searching for a job.".fit]
   end
-  table.style.width = 84
+  # table.style.width = 84
   table.align_column(0, :center)
   table.title = "Hello job seeker! Welcome to SMARTER CLASSIFIEDS!.".fit
   puts table
@@ -83,24 +85,52 @@ def gets_user_data
 end
 
 def menu
-  table = Terminal::Table.new do |t|
-    t << ["1. Search for and save jobs by skillset"]
-    t << :separator
-    t.add_row ["2. Search for and save jobs by custom criteria"]
-    t << :separator
-    t.add_row ["3. View and edit saved jobs"]
-    t << :separator
-    t.add_row ["4. Update your profile"]
-    t << :separator
-    t.add_row ["5. View average interest in one of your saved jobs"]
-    t << :separator
-    t.add_row ["Please select an option by reference number or 'quit' to exit: "]
+  if User.last.interviews.empty?
+    table = Terminal::Table.new do |t|
+      t << ["1. Search for and save jobs by skillset"]
+      t << :separator
+      t.add_row ["2. Search for and save jobs by custom criteria"]
+      t << :separator
+      t.add_row ["3. View and edit saved jobs"]
+      t << :separator
+      t.add_row ["4. Update your profile"]
+      t << :separator
+      t.add_row ["5. View average interest in one of your saved jobs"]
+      t << :separator
+      t.add_row ["Please select an option by reference number or 'quit' to exit: "]
+    end
+    table.title = "=======MENU========="
+    # table.style.width = 84
+    table.align_column(0, :center)
+    puts table
+    puts "\n"
+  else
+    table = Terminal::Table.new do |t|
+      t << ["1. Search for and save jobs by skillset"]
+      t << :separator
+      t.add_row ["2. Search for and save jobs by custom criteria"]
+      t << :separator
+      t.add_row ["3. View and edit saved jobs"]
+      t << :separator
+      t.add_row ["4. Update your profile"]
+      t << :separator
+      t.add_row ["5. View average interest in one of your saved jobs"]
+      t << :separator
+      t.add_row [("6. View Interview Requests").colorize(:background => :green)]
+      t << :separator
+      t.add_row ["Please select an option by reference number or 'quit' to exit: "]
+    end
+    table.title = "=======MENU========="
+    # table.style.width = 84
+    table.align_column(0, :center)
+    puts table
+    puts
+    table = Terminal::Table.new do |t|
+      t << ['Congratulations, an Employer Has Reviewed Your Application and Would Like to Schedule an Interview! View Your Interviews Page to Begin a Technical Screening Interview'.colorize(:yellow).fit]
+    end
+    table.align_column(0, :center)
+    puts table
   end
-  table.title = "=======MENU========="
-  table.style.width = 84
-  table.align_column(0, :center)
-  puts table
-  puts "\n"
 end
 
 def exit_program
@@ -129,7 +159,7 @@ def auto_search
      table = Terminal::Table.new do |t|
        t << [job.description.fit]
      end
-     table.style.width = 84
+     # table.style.width = 84
      puts table
    }
 end
@@ -155,7 +185,7 @@ def search_manual_entry
     table = Terminal::Table.new do |t|
       t << [job.description.fit]
     end
-    table.style.width = 84
+    # table.style.width = 84
     puts table
   }
 end
@@ -181,7 +211,7 @@ def save_job_with_interest_rating
 (or multiple jobs) to your job list, please enter the 'Job Number."
   puts ' '
   puts "Would you like to save any of the jobs listed above? please enter 'yes' if you would like
-to save any and 'no' if you would like to be redirected back to menu: "
+to save and and 'no' if you would like to be redirected back to menu: "
 
   search_desire = nil
 
@@ -201,8 +231,24 @@ to save any and 'no' if you would like to be redirected back to menu: "
         job_number = gets.chomp
         loop do
           if job_number.to_i.to_s == job_number
-            add_to_saved_jobs(job_number)
-            break
+            table = Terminal::Table.new do |t|
+              t << ["Would you like to Apply to this job (y/n)?".fit]
+            end
+              table.style.width = 84
+              table.align_column(0, :center)
+            puts table
+            input = gets.chomp
+            if input.downcase == "y"
+              add_to_saved_jobs(job_number)
+              add_to_interviews(job_number)
+              break
+            end
+            puts "Would you like to Save this Job for later (y/n)?"
+            input = gets.chomp
+            if input.downcase == "y"
+              add_to_saved_jobs(job_number)
+              break
+            end
           else
             print "Whoops! that's not a valid input. Please enter a valid command: "
             job_number = gets.chomp
@@ -246,6 +292,14 @@ def add_to_saved_jobs(num)
   new_job.job = Job.find(num)
   User.last.saved_jobs << new_job
   Job.find(num).saved_jobs << new_job
+end
+
+def add_to_interviews(num)
+  interview = Interview.create
+  interview.user = User.last
+  interview.job = Job.find(num)
+  User.last.interviews << interview
+  Job.find(num).interviews << interview
 end
 
 def add_interest_rating(rating)
@@ -394,6 +448,10 @@ def view_average_interest_of_saved_job
       end
     end
   end
+end
+
+
+def view_interviews
 end
 
 def location_match(job)

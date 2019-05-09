@@ -453,10 +453,6 @@ Please enter a valid job number: ".colorize(:red)
 end
 
 def view_profile
-  puts "\nHere is your current profile...\nName: #{User.last.name}\nSkills: #{User.last.skills}\nExperience: #{User.last.experience}\nLocation: #{User.last.location}"
-end
-
-def update_profile
   table = Terminal::Table.new do |t|
     t << ["1. Skills: #{User.last.skills}".fit]
     t << :separator
@@ -468,56 +464,83 @@ def update_profile
   table.align_column(0, :left)
   table.title = "=====Current Profile=====".fit.colorize(:green)
   puts table
-  print "Please enter the number associated with the category you would like to update or type 'exit' to exit: "
-
-  input = gets.chomp
-  if input == "1"
-    print "Please enter please enter the full updated list of skills or 'exit' to exit: "
-    puts ' '
-    user_input = gets.chomp
-    if user_input != "exit"
-      User.last.update(skills: user_input)
-      view_profile
-      puts ' '
-      puts "Your skills have been updated!"
-      puts ' '
-    else
-      puts "Your profile has not been updated."
-      puts ' '
-    end
-  elsif input == "2"
-    puts "Please enter current experience level in years to update experience or type 'exit' to exit:"
-    puts ' '
-    user_input = gets.chomp
-    if user_input != "exit"
-      User.last.update(experience: user_input)
-      view_profile
-      puts ' '
-      puts "Your experience has been updated!"
-      puts ' '
-    else
-      puts "Your profile has not been updated."
-      puts ' '
-    end
-  elsif input == "3"
-    puts "Please update your default search location or type 'exit' to exit:"
-    puts ' '
-    user_input = gets.chomp
-    if user_input != "exit"
-      User.last.update(location: user_input)
-      view_profile
-      puts ' '
-      puts "Your location has been updated!"
-      puts ' '
-    else
-      puts "Your profile has not been updated."
-      puts ' '
-    end
-  else
-    puts "Your profile has not been updated."
-    puts ' '
-  end
 end
+
+def update_profile
+  view_profile
+  print "would you like to update your information? (y/n): "
+  search_desire = nil
+  loop do
+    if search_desire == 'n'
+      break
+    elsif search_desire == nil
+      search_desire = gets.chomp
+    else
+        puts ' '
+        print "Please enter the reference number for the element you would like to update: "
+        input = gets.chomp
+        if input == "1"
+          print "Please enter the full updated list of skills or 'exit' to exit: "
+          puts ' '
+          user_input = gets.chomp
+          if user_input != "exit"
+            User.last.update(skills: user_input)
+            view_profile
+            puts ' '
+            puts "Your skills have been updated!"
+            puts ' '
+          else
+            puts "Your profile has not been updated."
+            puts ' '
+          end
+        elsif input == "2"
+          puts "Please enter current experience level in years to update experience or type 'exit' to exit:"
+          puts ' '
+          user_input = gets.chomp
+          if user_input != "exit"
+            User.last.update(experience: user_input)
+            view_profile
+            puts ' '
+            puts "Your experience has been updated!"
+            puts ' '
+          else
+            puts "Your profile has not been updated."
+            puts ' '
+          end
+        elsif input == "3"
+          puts "Please update your default search location or type 'exit' to exit:"
+          puts ' '
+          user_input = gets.chomp
+          if user_input != "exit"
+            User.last.update(location: user_input)
+            view_profile
+            puts ' '
+            puts "Your location has been updated!"
+            puts ' '
+          else
+            puts "Your profile has not been updated."
+            puts ' '
+          end
+        else
+          puts "Your profile has not been updated."
+          puts ' '
+        end
+      puts ' '
+      print "Would you like to edit another element? (y/n): "
+      search_desire = gets.chomp
+
+      if search_desire.downcase == 'n'
+        search_desire = 'n'
+        break
+      elsif search_desire == 'y'
+      else
+        print "Whoops! that's not a valid input. Please enter a valid command: ".colorize(:red)
+      end
+    end
+  end
+  puts ' '
+end
+
 
 def average_interest_level(job_num)
   job = Job.find(job_num)

@@ -12,8 +12,10 @@ def run
       auto_search
       save_job_with_interest_rating
     elsif input == "2"
-      search_manual_entry
-      save_job_with_interest_rating
+      return_value = search_manual_entry
+      if return_value
+        save_job_with_interest_rating
+      end
     elsif input == "3"
       view_and_edit_jobs
     elsif input == "4"
@@ -135,29 +137,118 @@ def auto_search
 end
 
 def search_manual_entry
-  print "Please enter keywords for your search separated by spaces: "
-  keywords = gets.chomp.str.split(/[^'’\p{L}\p{M}]+/)
+  puts "Would you like to search by location? (y/n)"
+  input = gets.chomp
+  if input == "y"
+    puts "Please enter a location:"
+    location = gets.chomp
+    results = Job.all.select { |job| location_match_arbitrary(job, location) }
+    results.each { |job|
+      puts ' '
+      print '------------------------------------------------------------------------------------'
+      puts ' '
+      puts "Job #{job.id}."
+      puts ' '
+      puts "<<<#{job.company}>>>"
+      puts "--#{job.title}--"
+      puts "..#{job.position_type}.."
+      puts ' '
+      puts "...#{job.location}..."
+      puts
+      table = Terminal::Table.new do |t|
+        t << [job.description.fit]
+      end
+      #table.style.width = 84
+      puts table
+    }
+  elsif input == "n"
+    puts "Would you like to search by skills? (y/n)"
+    input = gets.chomp
+    if input == "y"
+      puts "Please enter skills:"
+      skills = gets.chomp
+      keywords = skills.split(/[^'’\p{L}\p{M}]+/)
+      results = Job.all.select { |job|
+        (skill_match_title?(keywords, job) || skill_match_description?(keywords, job)) }
+      results.each { |job|
+        puts ' '
+        print '------------------------------------------------------------------------------------'
+        puts ' '
+        puts "Job #{job.id}."
+        puts ' '
+        puts "<<<#{job.company}>>>"
+        puts "--#{job.title}--"
+        puts "..#{job.position_type}.."
+        puts ' '
+        puts "...#{job.location}..."
+        puts
+        table = Terminal::Table.new do |t|
+          t << [job.description.fit]
+        end
+        #table.style.width = 86
+        puts table
+      }
+    elsif input == "n"
+      puts "Would you like to search by location and skills? (y/n)"
+      input = gets.chomp
+      if input == "y"
+        puts "Please enter a location:"
+        location = gets.chomp
+        puts "Please enter skills:"
+        skills = gets.chomp
+        keywords = skills.split(/[^'’\p{L}\p{M}]+/)
 
-  results = Job.all.select { |job|
-    (skill_match_title?(keywords, job) || skill_match_description?(keywords, job)) && location_match?(job)
-  }
-
-  results.each { |job|
-    puts ' '
-    print '------------------------------------------------------------------------------------'
-    puts ' '
-    puts "Job #{job.id}."
-    puts ' '
-    puts "<<<#{job.company}>>>"
-    puts "--#{job.title}--"
-    puts "..#{job.position_type}.."
-    puts ' '
-    table = Terminal::Table.new do |t|
-      t << [job.description.fit]
+        results = Job.all.select { |job|
+          (skill_match_title?(keywords, job) || skill_match_description?(keywords, job)) && location_match_arbitrary(job, location)
+        }
+        results.each { |job|
+          puts ' '
+          print '------------------------------------------------------------------------------------'
+          puts ' '
+          puts "Job #{job.id}."
+          puts ' '
+          puts "<<<#{job.company}>>>"
+          puts "--#{job.title}--"
+          puts "..#{job.position_type}.."
+          puts ' '
+          puts "...#{job.location}..."
+          puts
+          table = Terminal::Table.new do |t|
+            t << [job.description.fit]
+          end
+          #table.style.width = 84
+          puts table
+        }
+      elsif input == "n"
+        false
+      end
     end
-    table.style.width = 84
-    puts table
-  }
+  end
+
+
+  # print "Please enter keywords for your search separated by spaces: "
+  # keywords = gets.chomp.str.split(/[^'’\p{L}\p{M}]+/)
+  #
+  # results = Job.all.select { |job|
+  #   (skill_match_title?(keywords, job) || skill_match_description?(keywords, job)) && location_match?(job)
+  # }
+  #
+  # results.each { |job|
+  #   puts ' '
+  #   print '------------------------------------------------------------------------------------'
+  #   puts ' '
+  #   puts "Job #{job.id}."
+  #   puts ' '
+  #   puts "<<<#{job.company}>>>"
+  #   puts "--#{job.title}--"
+  #   puts "..#{job.position_type}.."
+  #   puts ' '
+  #   table = Terminal::Table.new do |t|
+  #     t << [job.description.fit]
+  #   end
+  #   table.style.width = 84
+  #   puts table
+  # }
 end
 
 def skill_match_title?(keywords, job)
@@ -168,9 +259,9 @@ def skill_match_description?(keywords, job)
   keywords.any? {|word| job.description.downcase.include?(word.downcase)}
 end
 
-def location_match?(job)
-  job.location.downcase == User.last.location.downcase
-end
+# def location_match?(job)
+#   job.location.downcase == User.last.location.downcase
+# end
 
 def save_job_with_interest_rating
   puts ' '
@@ -406,6 +497,22 @@ end
 
 def location_match(job)
   user_location = User.last.location.downcase
+  job_location = job.location.downcase
+  user_arr = user_location.split(/[\s,]+/)
+  user_arr = user_arr.collect{|x| x.strip || x }
+  user_location = user_arr.join
+  job_arr = job_location.split(/[\s,]+/)
+  job_arr = job_arr.collect{|x| x.strip || x }
+  job_location = job_arr.join
+  if user_location.include?(job_location) || job_location.include?(user_location)
+    true
+  else
+    false
+  end
+end
+
+def location_match_arbitrary(job, location)
+  user_location = location.downcase
   job_location = job.location.downcase
   user_arr = user_location.split(/[\s,]+/)
   user_arr = user_arr.collect{|x| x.strip || x }

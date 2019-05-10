@@ -10,11 +10,12 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_05_09_194733) do
+ActiveRecord::Schema.define(version: 2019_05_10_074235) do
 
   create_table "interviews", force: :cascade do |t|
     t.integer "user_id"
     t.integer "job_id"
+    t.string "result"
   end
 
   create_table "jobs", force: :cascade do |t|
@@ -26,6 +27,12 @@ ActiveRecord::Schema.define(version: 2019_05_09_194733) do
     t.string "company_url"
     t.string "location"
     t.string "company"
+  end
+
+  create_table "jokes", force: :cascade do |t|
+    t.integer "user_id"
+    t.integer "job_id"
+    t.string "setup_punchline"
   end
 
   create_table "saved_jobs", force: :cascade do |t|

@@ -59,7 +59,7 @@ Program menu:
 
 Below you will find a video that demonstrates how you can use the program:
 
----insert video here---
+https://www.youtube.com/watch?v=pMwxafmxXrQ&t=8s
 
 ###### Note:
 If you would like to refresh the job postings, you will need to delete the database (development.db) from your computer and re-seed the data by entering the following command:

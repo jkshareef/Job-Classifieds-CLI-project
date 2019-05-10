@@ -2,6 +2,7 @@ require_all './app/models'
 require 'word_wrap/core_ext'
 require 'catpix'
 
+
 def run
   computer_ascii
   welcome_message
@@ -311,20 +312,20 @@ to save any and 'no' if you would like to be redirected back to menu: "
   puts ' '
 end
 
-def add_to_saved_jobs(num)
+def add_to_saved_jobs(job_id)
   new_job = SavedJob.create
   new_job.user = User.last
-  new_job.job = Job.find(num)
+  new_job.job = Job.find(job_id)
   User.last.saved_jobs << new_job
-  Job.find(num).saved_jobs << new_job
+  Job.find(job_id).saved_jobs << new_job
 end
 
-def add_to_interviews(num)
+def add_to_interviews(job_id)
   interview = Interview.create
   interview.user = User.last
-  interview.job = Job.find(num)
+  interview.job = Job.find(job_id)
   User.last.interviews << interview
-  Job.find(num).interviews << interview
+  Job.find(job_id).interviews << interview
 end
 
 def add_interest_rating(rating)
@@ -498,23 +499,12 @@ def view_average_interest_of_saved_job
     jobs = User.last.saved_jobs
     jobs.each_with_index do |saved_job, index|
       puts ' '
-      print '------------------------------------------------------------------------------------'
+      puts '-------------------------------------------------------------------------'
       puts ' '
-      puts "Job Number:#{saved_job.job.id}"
+      puts "Job Number:#{saved_job.job.id}, #{saved_job.job.company}"
       puts ' '
-      puts "<<<#{saved_job.job.company}>>>"
-      puts " "
-      puts "--#{saved_job.job.title}--"
-      puts " "
-      puts "..#{saved_job.job.position_type}.."
-      puts ' '
-      puts "...#{saved_job.job.location}..."
-      puts ' '
-      table = Terminal::Table.new do |t|
-        t << [saved_job.job.description.fit]
-      end
-      puts table
-    end 
+      puts saved_job.job.description
+    end
     input = nil
     while input != "exit" do
       puts ' '
@@ -587,6 +577,7 @@ def view_interviews
         break
       elsif id_list.include?(input.to_i)
         run_interview(input.to_i)
+        break
       else
         puts "Please enter a valid job number or type 'exit'"
       end
@@ -594,6 +585,111 @@ def view_interviews
   end
 
   def run_interview(job_id)
+    interview_pic
+    interview_welcome(job_id)
+    joke_check(job_id)
+  end
+
+  def get_jokes
+    array = Joke.get_choices
+    prompt = TTY::Prompt.new
+    prompt.select("Choose Your Joke Wisely") do |menu|
+      menu.choice "#{array[0]['setup']}#{array[0]['punchline']}".fit
+      menu.choice "#{array[1]['setup']}#{array[1]['punchline']}".fit
+      menu.choice "#{array[2]['setup']}#{array[2]['punchline']}".fit
+      menu.choice "#{array[3]['setup']}#{array[3]['punchline']}".fit
+    end
+  end
+
+  def joke_check(job_id)
+    decision = rand(1..2)
+    past_interview = User.last.interviews.find {|interview| interview.job = Job.find(job_id)}
+    a = Artii::Base.new
+    input = get_jokes
+    Job.find(job_id).jokes.each do |joke|
+      if input.gsub(/\s+/, ' ').strip == joke.setup_punchline
+        interview_pic
+        puts 'AHAHAAHAHAAHA...hah'
+        sleep(1)
+        puts 'ha..heh...wait....'
+        sleep(1)
+        puts "I think we've heard that one before"
+        sleep(2)
+        puts "In fact I'm sure of it! I wrote it down in my notebook, circled it and said 'SUCH A FUN JOKE'!"
+        sleep(2)
+        answer = truth_check
+        if answer == "No"
+          puts "\n\n"
+          sleep(1)
+          puts "...I'm not buying it"
+          sleep(1)
+          puts a.asciify("Don't Plagiarize !")
+          puts "\n\n"
+          decision = nil
+          past_interview.update(result: 'Not Hired')
+          break
+        elsif answer == "Yes"
+          puts "\n\n"
+          sleep(1)
+          puts a.asciify("Don't Plagiarize !")
+          puts "\n\n"
+          decision = nil
+          past_interview.update(result: 'Not Hired')
+          break
+        end
+      end
+    end
+
+
+    if decision == 1
+      puts 'AHAHAAHAHAAHA...hah'
+      sleep(1)
+      puts 'UHHHH WEEEE OOOO my sides'
+      sleep(1)
+      puts 'That was so good!'
+      sleep(1)
+      puts 'The Job is Yours! When Can you Start?'
+      sleep(3)
+      past_interview.update(result: 'Hired')
+      new_joke = Joke.create
+      new_joke.setup_punchline = input.gsub(/\s+/, ' ').strip
+      new_joke.user = User.last
+      new_joke.job = Job.find(job_id)
+      User.last.jokes << new_joke
+      Job.find(job_id).jokes << new_joke
+    elsif decision == 2
+      puts "."
+      sleep(1)
+      puts ".."
+      sleep(1)
+      puts "..."
+      sleep(1)
+      puts "Hmmmm"
+      sleep(1)
+      puts "Yea, no, that was a pretty good one...um"
+      sleep(2)
+      puts "I'm laughing on the inside, that's what it is"
+      sleep(1)
+      puts "We'll be in touch this week to let you know of our decision."
+      sleep(3)
+      past_interview.update(result: 'Not Hired')
+      new_joke = Joke.create
+      new_joke.setup_punchline = input.gsub(/\s+/, ' ').strip
+      new_joke.user = User.last
+      new_joke.job = Job.find(job_id)
+      User.last.jokes << new_joke
+      Job.find(job_id).jokes << new_joke
+    else
+    end
+  end
+
+  def truth_check
+    prompt = TTY::Prompt.new
+    prompt.select("Did you speak with another applicant?", %w(Yes No))
+  end
+
+
+  def interview_pic
     images = ['./images/little_pug.jpeg', './images/white_lab_suit.jpeg']
     selected_image = images.sample
     Catpix::print_image selected_image,
@@ -604,18 +700,24 @@ def view_interviews
     :bg => "black",
     :bg_fill => false,
     :resolution => "high"
-    interview_welcome(job_id)
-    array = Joke.get_choices
-    prompt = TTY::Prompt.new
-    prompt.select("Choose Your Joke Wisely") do |menu|
-      menu.choice "#{array[0]['setup']}......#{array[0]['punchline']}".fit
-      menu.choice "#{array[1]['setup']}......#{array[1]['punchline']}".fit
-      menu.choice "#{array[2]['setup']}......#{array[2]['punchline']}".fit
-      menu.choice "#{array[3]['setup']}......#{array[3]['punchline']}".fit
-    end
   end
 
   def interview_welcome(job_id)
+    past_interview = User.last.interviews.find {|interview| interview.job = Job.find(job_id)}
+    if past_interview != nil && past_interview.result == 'Not Hired'
+      puts "Wait...haven't I seen you before? Hmmm, no matter..."
+      sleep(2)
+      default_interview_message(job_id)
+    elsif past_interview != nil && past_interview.result == 'Hired'
+      puts "...Don't you work here already? Hmmm, maybe not"
+      sleep(2)
+      default_interview_message(job_id)
+    else
+      default_interview_message(job_id)
+    end
+  end
+
+  def default_interview_message(job_id)
     puts "Welcome to #{Job.find(job_id).company}, We are so happy to have you here..."
     sleep(2)
     puts "I'm going to be frank with you. You are a no-brainer hire..."

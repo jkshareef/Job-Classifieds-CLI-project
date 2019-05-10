@@ -1,4 +1,6 @@
 class Joke < ActiveRecord::Base
+  belongs_to :job
+  belongs_to :user
 
   def self.get_choices
     response_string = RestClient.get("https://official-joke-api.appspot.com/jokes/programming/ten")

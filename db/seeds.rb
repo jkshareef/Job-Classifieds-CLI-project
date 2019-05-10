@@ -1,3 +1,5 @@
+JokeArray = Joke.get_choices
+
 def get_job_listings
   response_array = []
   i = 0
@@ -41,25 +43,41 @@ def fake_user_data
   end
 end
 
-def fake_add_to_saved_jobs_and_interviews(id)
+def fake_add_saved_jobs(id)
   rand(1..3).times do
-    job_num = rand(1..350)
+    job_num = rand(1..Job.all.size - 1)
     new_job = SavedJob.create
     new_job.user = User.find(id)
     new_job.job = Job.find(job_num)
     new_job.interest_level = rand(1..10)
     User.find(id).saved_jobs << new_job
     Job.find(job_num).saved_jobs << new_job
-    interview = Interview.create
-    interview.user = User.find(id)
-    interview.job = Job.find(job_num)
-    User.find(id).interviews << interview
-    Job.find(job_num).interviews << interview
   end
 end
 
+def fake_add_interviews_jokes(id)
+  job_num = rand(1..Job.all.size)
+
+  interview = Interview.create
+  interview.user = User.find(id)
+  interview.job = Job.find(job_num)
+  User.find(id).interviews << interview
+  Job.find(job_num).interviews << interview
+
+
+  joke = Joke.create
+  joke_string = JokeArray.sample
+  joke_string_concat = joke_string["setup"] + joke_string["punchline"]
+  joke.setup_punchline = joke_string_concat
+  joke.user = User.find(id)
+  joke.job = Job.find(job_num)
+  User.find(id).jokes << joke
+  Job.find(job_num).jokes << joke
+end
+
 def fake_user_actions
-  User.all.each {|user| fake_add_to_saved_jobs_and_interviews(user.id)}
+  User.all.each {|user| fake_add_saved_jobs(user.id)}
+  User.all.each {|user| fake_add_interviews_jokes(user.id)}
 end
 
 

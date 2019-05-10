@@ -499,11 +499,22 @@ def view_average_interest_of_saved_job
     jobs = User.last.saved_jobs
     jobs.each_with_index do |saved_job, index|
       puts ' '
-      puts '-------------------------------------------------------------------------'
+      print '------------------------------------------------------------------------------------'
       puts ' '
-      puts "Job Number:#{saved_job.job.id}, #{saved_job.job.company}"
+      puts "Job Number:#{saved_job.job.id}"
+      puts
+      puts "<<<#{saved_job.job.company}>>>"
+      puts " "
+      puts "--#{saved_job.job.title}--"
+      puts " "
+      puts "..#{saved_job.job.position_type}.."
       puts ' '
-      puts saved_job.job.description
+      puts "...#{saved_job.job.location}..."
+      puts ' '
+      table = Terminal::Table.new do |t|
+        t << [saved_job.job.description.fit]
+      end
+      puts table
     end
     input = nil
     while input != "exit" do

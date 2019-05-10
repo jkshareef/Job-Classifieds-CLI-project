@@ -1,5 +1,6 @@
 require_all './app/models'
 require 'word_wrap/core_ext'
+require 'catpix'
 
 def run
   computer_ascii
@@ -94,8 +95,6 @@ def menu
       t.add_row ["4. Update your profile"]
       t << :separator
       t.add_row ["5. View average interest in one of your saved jobs"]
-      t << :separator
-      t.add_row ["Please select an option by reference number or 'quit' to exit: "]
     end
     table.title = "=====MENU=====".colorize(:green)
     table.align_column(0, :left)
@@ -124,7 +123,7 @@ def menu
     print "Please select an option by reference number or 'quit' to exit: "
     puts
     table = Terminal::Table.new do |t|
-      t << ['Congratulations, an Employer Has Reviewed Your Application and Would Like to Schedule an Interview! View Your Interviews Page to Begin a Technical Screening Interview'.colorize(:yellow).fit]
+      t << ['Congratulations, an Employer Has Reviewed Your Application and Would Like to Schedule an Interview! View Your Interviews Page to See All Scheduled Interviews'.colorize(:yellow).fit]
     end
     table.align_column(0, :center)
     puts table
@@ -234,7 +233,7 @@ def save_job_with_interest_rating
   puts ' '
 
   puts "Above is a list of jobs based on your search criteria! In order to Apply or Save a job
-(or multiple jobs) to your job list, please enter the 'Job Number."
+(or multiple jobs) to your job list, please enter the 'Job Number'."
   puts ' '
   print "Would you like to save any of the jobs listed above? please enter 'yes' if you would like
 to save any and 'no' if you would like to be redirected back to menu: "
@@ -354,7 +353,6 @@ def view_and_edit_jobs
       table = Terminal::Table.new do |t|
         t << [saved_job.job.description.fit]
       end
-      table.style.width = 84
       puts table
     end
     puts ' '
@@ -521,5 +519,98 @@ def view_average_interest_of_saved_job
 end
 
 
-def view_interviews
+
+
+def location_match(job)
+  user_location = User.last.location.downcase
+  job_location = job.location.downcase
+  user_arr = user_location.split(/[\s,]+/)
+  user_arr = user_arr.collect{|x| x.strip || x }
+  user_location = user_arr.join
+  job_arr = job_location.split(/[\s,]+/)
+  job_arr = job_arr.collect{|x| x.strip || x }
+  job_location = job_arr.join
+  if user_location.include?(job_location) || job_location.include?(user_location)
+    true
+  else
+    false
+  end
 end
+
+def location_match_arbitrary(job, location)
+  user_location = location.downcase
+  job_location = job.location.downcase
+  user_arr = user_location.split(/[\s,]+/)
+  user_arr = user_arr.collect{|x| x.strip || x }
+  user_location = user_arr.join
+  job_arr = job_location.split(/[\s,]+/)
+  job_arr = job_arr.collect{|x| x.strip || x }
+  job_location = job_arr.join
+  if user_location.include?(job_location) || job_location.include?(user_location)
+    true
+  else
+    false
+  end
+end
+
+def view_interviews
+  interviews = User.last.interviews
+  id_list = interviews.map {|interview| interview.job.id}
+  interviews.each_with_index do |interview, index|
+    puts "\n------------------------------------------------------------------------------------\n"
+    puts "Interview ##{index+1} #{interview.job.company} Job Id Number: #{interview.job.id}\n"
+    puts "Job Title: #{interview.job.title}"
+    puts "Scheduled Date: #{Faker::Date.between(Date.today, 10.days.from_now)}\n"
+    table = Terminal::Table.new do |t|
+      t << [interview.job.description.fit]
+    end
+    puts table
+  end
+    table = Terminal::Table.new do |t|
+      t << ["An interview is a technical phone screening, You may choose to begin the Interview at any time by entering the Job Id Number or type 'exit'".colorize(:yellow).fit]
+    end
+    puts table
+    loop do
+      input = gets.chomp
+      if input.downcase == 'exit'
+        break
+      elsif id_list.include?(input.to_i)
+        run_interview(input.to_i)
+      else
+        puts "Please enter a valid job number or type 'exit'"
+      end
+    end
+  end
+
+  def run_interview(job_id)
+    images = ['./images/little_pug.jpeg', './images/white_lab_suit.jpeg']
+    selected_image = images.sample
+    Catpix::print_image selected_image,
+    :limit_x => 1.0,
+    :limit_y => 0.6,
+    :center_x => true,
+    :center_y => false,
+    :bg => "black",
+    :bg_fill => false,
+    :resolution => "high"
+    interview_welcome(job_id)
+    array = Joke.get_choices
+    prompt = TTY::Prompt.new
+    prompt.select("Choose Your Joke Wisely") do |menu|
+      menu.choice "#{array[0]['setup']}......#{array[0]['punchline']}".fit
+      menu.choice "#{array[1]['setup']}......#{array[1]['punchline']}".fit
+      menu.choice "#{array[2]['setup']}......#{array[2]['punchline']}".fit
+      menu.choice "#{array[3]['setup']}......#{array[3]['punchline']}".fit
+    end
+  end
+
+  def interview_welcome(job_id)
+    puts "Welcome to #{Job.find(job_id).company}, We are so happy to have you here..."
+    sleep(2)
+    puts "I'm going to be frank with you. You are a no-brainer hire..."
+    sleep(2)
+    puts "What is most important here at #{Job.find(job_id).company} is to keep it light..."
+    sleep(2)
+    puts "If you can tell us a really great programming joke the job is yours!"
+    sleep(5)
+  end

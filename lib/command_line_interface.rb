@@ -158,7 +158,7 @@ def print_search_results(results)
     puts "..#{job.position_type}.."
     puts ' '
     puts "...#{job.location}..."
-    puts
+    puts ' '
     table = Terminal::Table.new do |t|
       t << [job.description.fit]
   end

@@ -70,6 +70,12 @@ rake setup_db
 
  Be aware that deleting the database will delete all of the user profile info you have entered in the application as well as any saved jobs you may have.
 
+## Models
+
+![Flowchart](./images/module_1_project_SMARTER_CLASSIFIEDS.png)
+
+This flowchart shows the models in this application and their relationships. Additionally the user story is detailed with different functionalities of this program.
+
 ## Uninstalling Dependencies
 
 If you would like to uninstall the dependencies after use enter the following command at the top of the directory:

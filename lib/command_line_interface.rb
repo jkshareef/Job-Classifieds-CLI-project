@@ -1,10 +1,11 @@
 require_all './app/models'
 require 'word_wrap/core_ext'
+require 'catpix'
 
 def run
   computer_ascii
   welcome_message
-  gets_user_data
+  # gets_user_data
   menu
   input = gets.chomp.downcase
   until input == "quit"
@@ -603,14 +604,43 @@ def view_interviews
       input = gets.chomp
       if input.downcase == 'exit'
         break
-      elsif id_list.include?(input)
-        initiate_interview(input)
+      elsif id_list.include?(input.to_i)
+        run_interview(input.to_i)
       else
         puts "Please enter a valid job number or type 'exit'"
       end
     end
   end
 
-  def initiate_interview(job_id)
+  def run_interview(job_id)
+    images = ['./images/little_pug.jpeg', './images/white_lab_suit.jpeg']
+    selected_image = images.sample
+    Catpix::print_image selected_image,
+    :limit_x => 1.0,
+    :limit_y => 0.6,
+    :center_x => true,
+    :center_y => false,
+    :bg => "black",
+    :bg_fill => false,
+    :resolution => "high"
+    interview_welcome(job_id)
+    array = Joke.get_choices
+    prompt = TTY::Prompt.new
+    prompt.select("Choose Your Joke Wisely") do |menu|
+      menu.choice "#{array[0]['setup']}......#{array[0]['punchline']}".fit
+      menu.choice "#{array[1]['setup']}......#{array[1]['punchline']}".fit
+      menu.choice "#{array[2]['setup']}......#{array[2]['punchline']}".fit
+      menu.choice "#{array[3]['setup']}......#{array[3]['punchline']}".fit
+    end
+  end
 
+  def interview_welcome(job_id)
+    puts "Welcome to #{Job.find(job_id).company}, We are so happy to have you here..."
+    sleep(2)
+    puts "I'm going to be frank with you. You are a no-brainer hire..."
+    sleep(2)
+    puts "What is most important here at #{Job.find(job_id).company} is to keep it light..."
+    sleep(2)
+    puts "If you can tell us a really great programming joke the job is yours!"
+    sleep(5)
   end

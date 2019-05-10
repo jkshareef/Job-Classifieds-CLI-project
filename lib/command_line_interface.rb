@@ -28,7 +28,7 @@ def run
       view_interviews
     end
     menu
-    input = gets.chomp
+    input = gets.chomp.downcase
   end
   exit_program
 end
@@ -74,13 +74,13 @@ def gets_user_data
   new_user = User.create
 
   print "Enter your name: "
-  new_user.update(name: gets.chomp)
+  new_user.update(name: gets.chomp.downcase)
   print "Enter your skills: "
-  new_user.update(skills: gets.chomp)
+  new_user.update(skills: gets.chomp.downcase)
   print "Enter Experience: "
-  new_user.update(experience: gets.chomp)
+  new_user.update(experience: gets.chomp.downcase)
   print "Enter default search location: "
-  new_user.update(location: gets.chomp)
+  new_user.update(location: gets.chomp.downcase)
   puts ' '
 end
 
@@ -132,7 +132,11 @@ def menu
 end
 
 def exit_program
-  puts "Goodbye!"
+  puts ' '
+  puts "GOODBYE!".colorize(:red)
+  puts '
+
+  '
 end
 
 def auto_search
@@ -168,30 +172,30 @@ end
 
 def search_manual_entry
   puts "Would you like to search by location? (y/n)".colorize(:green)
-  input = gets.chomp
+  input = gets.chomp.downcase
   if input == "y"
     puts "Please enter a location:".colorize(:green)
-    location = gets.chomp
+    location = gets.chomp.downcase
     results = Job.all.select { |job| location_match?(job, location) }
     print_search_results(results)
   elsif input == "n"
     puts "Would you like to search by skills? (y/n)".colorize(:green)
-    input = gets.chomp
+    input = gets.chomp.downcase
     if input == "y"
       puts "Please enter skills:".colorize(:green)
-      skills = gets.chomp
+      skills = gets.chomp.downcase
       keywords = skills.split(/[^'’\p{L}\p{M}]+/)
       results = Job.all.select { |job|
         (skill_match_title?(keywords, job) || skill_match_description?(keywords, job)) }
       print_search_results(results)
     elsif input == "n"
       puts "Would you like to search by location and skills? (y/n)".colorize(:green)
-      input = gets.chomp
+      input = gets.chomp.downcase
       if input == "y"
         puts "Please enter a location:".colorize(:green)
-        location = gets.chomp
+        location = gets.chomp.downcase
         puts "Please enter skills:".colorize(:green)
-        skills = gets.chomp
+        skills = gets.chomp.downcase
         keywords = skills.split(/[^'’\p{L}\p{M}]+/)
         results = Job.all.select { |job|
           (skill_match_title?(keywords, job) || skill_match_description?(keywords, job)) && location_match?(job, location)
@@ -245,7 +249,7 @@ def save_job_with_interest_rating
       print "BACK TO MENU: ".colorize(:blue)
       break
     else
-      search_desire = gets.chomp
+      search_desire = gets.chomp.downcase
     end
     if search_desire.downcase == 'n'
       print "BACK TO MENU: ".colorize(:blue)
@@ -255,7 +259,7 @@ def save_job_with_interest_rating
       loop do
         puts ' '
         print "Job Number: "
-        job_number = gets.chomp
+        job_number = gets.chomp.downcase
         loop do
           if job_number.to_i.to_s == job_number
             table = Terminal::Table.new do |t|
@@ -264,30 +268,30 @@ def save_job_with_interest_rating
               table.style.width = 84
               table.align_column(0, :center)
             puts table
-            input = gets.chomp
+            input = gets.chomp.downcase
             if input.downcase == "y"
               add_to_saved_jobs(job_number)
               add_to_interviews(job_number)
               break
             end
             puts "Would you like to Save this Job for later (y/n)?".colorize(:green)
-            input = gets.chomp
+            input = gets.chomp.downcase
             if input.downcase == "y"
               add_to_saved_jobs(job_number)
               break
             end
           else
             print "Whoops! that's not a valid input. Please enter a valid command: ".colorize(:red)
-            job_number = gets.chomp
+            job_number = gets.chomp.downcase
           end
         end
 
         print "Curent level of interest on a scale of 1-10: "
-        job_rating = gets.chomp
+        job_rating = gets.chomp.downcase
         loop do
           if !(1..10).to_a.include?(job_rating.to_i)
             print "Please enter a value between 1 and 10: ".colorize(:red)
-            job_rating = gets.chomp
+            job_rating = gets.chomp.downcase
           elsif job_rating.to_i.to_s == job_rating
             add_interest_rating(job_rating)
             break
@@ -296,7 +300,7 @@ def save_job_with_interest_rating
 
         puts ' '
         print "Would you like to add another job? (y/n): ".colorize(:green)
-        search_desire = gets.chomp
+        search_desire = gets.chomp.downcase
 
         if search_desire.downcase == 'n'
           break
@@ -358,11 +362,11 @@ def view_and_edit_jobs
     end
     puts ' '
     print "Would you like to delete some jobs from your saved list? (y/n): ".colorize(:green)
-    input = gets.chomp
+    input = gets.chomp.downcase
     if input.downcase == 'y'
       puts ' '
       print "Would you like to remove *all* of your jobs? (y/n): ".colorize(:green)
-      input = gets.chomp
+      input = gets.chomp.downcase
       if input.downcase == 'y'
         User.last.saved_jobs.destroy_all
       else
@@ -370,7 +374,7 @@ def view_and_edit_jobs
         print "Please enter the job number for the job you *would* like to delete or enter 'exit' to be redirected: ".colorize(:green)
 
         loop do
-          input = gets.chomp
+          input = gets.chomp.downcase
           if input == 'exit'
             break
           elsif SavedJob.exists?(job_id: input, user_id: User.last.id)
@@ -412,14 +416,14 @@ def update_profile
     if search_desire == 'n'
       break
     elsif search_desire == nil
-      search_desire = gets.chomp
+      search_desire = gets.chomp.downcase
     elsif search_desire == 'y'
         puts ' '
         print "Please enter the reference number for the element you would like to update: ".colorize(:green)
-        input = gets.chomp
+        input = gets.chomp.downcase
         if input == "1"
           print "Please enter the full updated list of skills or 'exit' to exit: ".colorize(:green)
-          user_input = gets.chomp
+          user_input = gets.chomp.downcase
           if user_input != "exit"
             User.last.update(skills: user_input)
             puts "YOUR PROFILE HAS BEEN UPDATED: ".colorize(:blue)
@@ -430,7 +434,7 @@ def update_profile
           end
         elsif input == "2"
           print "Please enter current experience level in years to update experience or type 'exit' to exit:"
-          user_input = gets.chomp
+          user_input = gets.chomp.downcase
           if user_input != "exit"
             User.last.update(experience: user_input)
             puts "YOUR PROFILE HAS BEEN UPDATED: ".colorize(:blue)
@@ -440,7 +444,7 @@ def update_profile
           end
         elsif input == "3"
           print "Please update your default search location or type 'exit' to exit:"
-          user_input = gets.chomp
+          user_input = gets.chomp.downcase
           if user_input != "exit"
             User.last.update(location: user_input)
             print "YOUR PROFILE HAS BEEN UPDATED: ".colorize(:blue)
@@ -454,7 +458,7 @@ def update_profile
           view_profile
         end
       print "Would you like to edit another element? (y/n): ".colorize(:green)
-      search_desire = gets.chomp
+      search_desire = gets.chomp.downcase
 
       if search_desire.downcase == 'n'
         search_desire = 'n'
@@ -462,11 +466,11 @@ def update_profile
       elsif search_desire == 'y'
       else
         print "Whoops! that's not a valid input. Please enter a valid command: ".colorize(:red)
-        search_desire = gets.chomp
+        search_desire = gets.chomp.downcase
       end
     else
       print "Whoops! that's not a valid input. Please enter a valid command: ".colorize(:red)
-      search_desire = gets.chomp
+      search_desire = gets.chomp.downcase
     end
   end
   puts ' '
@@ -510,7 +514,7 @@ def view_average_interest_of_saved_job
       puts ' '
       puts "Please enter a job id to view average interest level or type exit:".colorize(:green)
       puts ' '
-      input = gets.chomp
+      input = gets.chomp.downcase
       if input != "exit"
         puts ' '
         puts "Average interest in this job is #{average_interest_level(input)}"
@@ -572,7 +576,7 @@ def view_interviews
     end
     puts table
     loop do
-      input = gets.chomp
+      input = gets.chomp.downcase
       if input.downcase == 'exit'
         break
       elsif id_list.include?(input.to_i)

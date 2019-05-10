@@ -5,7 +5,7 @@ require 'catpix'
 def run
   computer_ascii
   welcome_message
-  # gets_user_data
+  gets_user_data
   menu
   input = gets.chomp.downcase
   until input == "quit"
